@@ -19,7 +19,7 @@ export const personalInfo = {
 };
 
 export const skills = [
-  { name: "Frontend Development", icon: Layout, tech: ["React", "Vue", "Tailwind CSS", "TypeScript"] },
+  { name: "Frontend Development", icon: Layout, tech: ["React", "JavaScript", "HTML", "CSS"] },
   { name: "Backend Development", icon: Server, tech: ["Node.js", "Express", "Python", "Django"] },
   { name: "Database Management", icon: Database, tech: ["PostgreSQL", "MongoDB", "Redis"] },
   { name: "UI/UX Design", icon: Palette, tech: ["Figma", "Framer", "Prototyping"] },

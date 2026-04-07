@@ -2,6 +2,27 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Section } from './Section';
 import { skills } from '../data/portfolio';
+import { FaReact, FaJs, FaHtml5, FaCss3Alt, FaNodeJs, FaPython } from 'react-icons/fa';
+import { SiExpress, SiDjango, SiPostgresql, SiMongodb, SiRedis, SiFigma, SiFramer } from 'react-icons/si';
+
+const getTechIcon = (tech) => {
+  const icons = {
+    'React': <FaReact className="w-4 h-4 text-cyan-400 mr-3" />,
+    'JavaScript': <FaJs className="w-4 h-4 text-yellow-400 mr-3" />,
+    'HTML': <FaHtml5 className="w-4 h-4 text-orange-500 mr-3" />,
+    'CSS': <FaCss3Alt className="w-4 h-4 text-blue-500 mr-3" />,
+    'Node.js': <FaNodeJs className="w-4 h-4 text-green-600 mr-3" />,
+    'Express': <SiExpress className="w-4 h-4 text-gray-400 mr-3" />,
+    'Python': <FaPython className="w-4 h-4 text-blue-500 mr-3" />,
+    'Django': <SiDjango className="w-4 h-4 text-green-700 mr-3" />,
+    'PostgreSQL': <SiPostgresql className="w-4 h-4 text-blue-400 mr-3" />,
+    'MongoDB': <SiMongodb className="w-4 h-4 text-green-500 mr-3" />,
+    'Redis': <SiRedis className="w-4 h-4 text-red-500 mr-3" />,
+    'Figma': <SiFigma className="w-4 h-4 text-pink-500 mr-3" />,
+    'Framer': <SiFramer className="w-4 h-4 text-blue-500 mr-3" />
+  };
+  return icons[tech] || <span className="w-2 h-2 bg-primary-400 dark:bg-primary-500 rounded-full mr-3"></span>;
+};
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -51,7 +72,7 @@ export function Skills() {
               <ul className="space-y-3">
                 {skillSet.tech.map((tech) => (
                   <li key={tech} className="flex items-center text-gray-600 dark:text-gray-300">
-                    <span className="w-2 h-2 bg-primary-400 dark:bg-primary-500 rounded-full mr-3"></span>
+                    {getTechIcon(tech)}
                     {tech}
                   </li>
                 ))}
