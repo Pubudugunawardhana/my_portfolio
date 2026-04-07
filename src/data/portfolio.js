@@ -9,9 +9,9 @@ import {
 } from 'lucide-react';
 
 export const personalInfo = {
-  name: "Alex Doe",
-  role: "Full Stack Developer",
-  shortBio: "I build modern, scalable web applications with a focus on user experience and clean code.",
+  name: "[Your Name]",
+  role: "Frontend Developer",
+  shortBio: "I build modern web applications.",
   longBio: "I'm a passionate developer with a strong background in web technologies. I love transforming complex problems into simple, beautiful, and intuitive designs. When I'm not coding, you'll find me exploring new technologies or contributing to open source.",
   email: "hello@example.com",
   github: "https://github.com",
