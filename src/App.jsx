@@ -1,4 +1,5 @@
 import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
 import { About } from './components/About';
@@ -8,8 +9,11 @@ import { Contact } from './components/Contact';
 import { Footer } from './components/Footer';
 import { Section } from './components/Section';
 import { MemoryGame } from './components/MemoryGame';
+import { AdminDashboard } from './components/admin/AdminDashboard';
+import { Login } from './components/admin/Login';
+import { ProtectedRoute } from './components/admin/ProtectedRoute';
 
-function App() {
+function PortfolioLayout() {
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300 antialiased selection:bg-primary-500 selection:text-white">
       <Navbar />
@@ -18,7 +22,7 @@ function App() {
         <About />
         <Skills />
         <Projects />
-        
+
         <Section id="fun-zone" title="Fun Zone" className="bg-slate-50 dark:bg-slate-900/50">
           <MemoryGame />
         </Section>
@@ -27,6 +31,25 @@ function App() {
       </main>
       <Footer />
     </div>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<PortfolioLayout />} />
+        <Route path="/login" element={<Login />} />
+        <Route
+          path="/admin/*"
+          element={
+            <ProtectedRoute>
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
+    </Router>
   );
 }
 

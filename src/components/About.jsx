@@ -1,9 +1,12 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Section } from './Section';
-import { personalInfo } from '../data/portfolio';
+import { useAbout } from '../hooks/useAbout';
+import { MapPin, Calendar, Mail, FileText } from 'lucide-react';
 
 export function About() {
+  const { aboutInfo } = useAbout();
+  const personalInfo = aboutInfo.name ? aboutInfo : {};
   return (
     <Section id="about" title="About Me" className="bg-gray-50 dark:bg-gray-800/50">
       <div className="grid md:grid-cols-2 gap-12 items-center">

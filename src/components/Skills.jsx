@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Section } from './Section';
-import { skills } from '../data/portfolio';
+import { useSkills } from '../hooks/useSkills';
 import { FaReact, FaJs, FaHtml5, FaCss3Alt, FaNodeJs, FaPython } from 'react-icons/fa';
 import { SiExpress, SiDjango, SiPostgresql, SiMongodb, SiRedis, SiFigma, SiFramer } from 'react-icons/si';
 
@@ -46,6 +46,8 @@ const itemVariants = {
 };
 
 export function Skills() {
+  const { skills } = useSkills();
+
   return (
     <Section id="skills" title="My Skills">
       <motion.div
@@ -56,16 +58,12 @@ export function Skills() {
         className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
       >
         {skills.map((skillSet, index) => {
-          const Icon = skillSet.icon;
           return (
             <motion.div
               key={skillSet.name}
               variants={itemVariants}
               className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow group"
             >
-              <div className="w-14 h-14 bg-primary-50 dark:bg-primary-900/40 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <Icon className="w-7 h-7 text-primary-600 dark:text-primary-400" />
-              </div>
               <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
                 {skillSet.name}
               </h3>

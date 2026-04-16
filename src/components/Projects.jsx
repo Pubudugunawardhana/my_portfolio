@@ -1,17 +1,18 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Section } from './Section';
-import { projects } from '../data/portfolio';
+import { useProjects } from '../hooks/useProjects';
 import { ExternalLink } from 'lucide-react';
 import { FaGithub } from 'react-icons/fa';
 
 export function Projects() {
+  const { projects } = useProjects();
   return (
     <Section id="projects" title="Featured Projects" className="bg-slate-50 dark:bg-slate-900/50">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {projects.map((project, index) => (
           <motion.div
-            key={project.title}
+            key={project.id || project.title}
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-50px" }}
@@ -40,7 +41,7 @@ export function Projects() {
               
               {/* Tech Stack Pills */}
               <div className="flex flex-wrap gap-2 pt-4">
-                {project.tech.map((techItem) => (
+                {Array.isArray(project.tech) && project.tech.map((techItem) => (
                   <span 
                     key={techItem} 
                     className="text-xs font-semibold px-3 py-1 bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-300 rounded-full"

@@ -1,10 +1,12 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { personalInfo } from '../data/portfolio';
+import { useAbout } from '../hooks/useAbout';
 import { ArrowRight, MousePointer2 } from 'lucide-react';
 import { FaBehance, FaDribbble, FaLinkedinIn } from 'react-icons/fa';
 
 export function Hero() {
+  const { aboutInfo } = useAbout();
+  const personalInfo = aboutInfo.name ? aboutInfo : {};
   return (
     <section id="home" className="relative min-h-screen flex items-center overflow-hidden bg-slate-900 dark:bg-slate-950 pt-20">
       {/* Topographic Background Pattern - simulated with subtle SVGs or gradients */}
