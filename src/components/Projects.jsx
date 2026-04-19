@@ -1,14 +1,41 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Section } from './Section';
-import { useProjects } from '../hooks/useProjects';
+import { getProjectsFromFirebase } from '../services/projectService';
 import { ExternalLink } from 'lucide-react';
 import { FaGithub } from 'react-icons/fa';
 
 export function Projects() {
-  const { projects } = useProjects();
+  const [projects, setProjects] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Hook runs immediately on component mount
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const firestoreData = await getProjectsFromFirebase();
+        setProjects(firestoreData);
+      } catch (error) {
+        console.error("Failed to load projects from cloud: ", error);
+        // Fallback to empty gallery gracefully
+      } finally {
+        setIsLoading(false); // Stop loading regardless of success/fail
+      }
+    };
+    
+    fetchProjects();
+  }, []);
   return (
     <Section id="projects" title="Featured Projects" className="bg-slate-50 dark:bg-slate-900/50">
+      
+      {/* Loading State UI */}
+      {isLoading ? (
+        <div className="flex flex-col items-center justify-center py-20">
+           <div className="w-12 h-12 border-4 border-slate-200 dark:border-slate-700 border-t-blue-500 rounded-full animate-spin"></div>
+           <p className="mt-4 text-slate-500 dark:text-slate-400 font-medium tracking-wide animate-pulse">Loading Cloud Projects...</p>
+        </div>
+      ) : (
+      
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {projects.map((project, index) => (
           <motion.div
@@ -75,7 +102,15 @@ export function Projects() {
             </div>
           </motion.div>
         ))}
+        
+        {projects.length === 0 && !isLoading && (
+          <div className="col-span-full py-12 text-center text-slate-500">
+            No projects found in your database. Open the Admin Panel to create some!
+          </div>
+        )}
       </div>
+      
+      )} {/* Close Loading ternary wrapper */}
     </Section>
   );
 }
