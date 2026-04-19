@@ -1,7 +1,18 @@
-import React from 'react';
-import { personalInfo } from '../data/portfolio';
+import React, { useState, useEffect } from 'react';
+import { listenToAboutFromFirebase } from '../services/aboutService';
 
 export function Footer() {
+  const [personalInfo, setPersonalInfo] = useState({ name: 'Pubudu Gunawardhana' });
+
+  useEffect(() => {
+    const unsub = listenToAboutFromFirebase((data) => {
+      if (data && data.name) {
+        setPersonalInfo(data);
+      }
+    });
+    return () => unsub();
+  }, []);
+
   return (
     <footer className="bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 py-8">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between">

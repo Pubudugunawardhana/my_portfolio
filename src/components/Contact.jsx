@@ -1,11 +1,20 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Section } from './Section';
-import { personalInfo } from '../data/portfolio';
+import { listenToAboutFromFirebase } from '../services/aboutService';
 import { Mail, Send } from 'lucide-react';
-import { FaGithub, FaLinkedin } from 'react-icons/fa';
+import { FaGithub, FaLinkedin, FaMedium } from 'react-icons/fa';
 
 export function Contact() {
+  const [personalInfo, setPersonalInfo] = useState({ email: '', github: '', linkedin: '', medium: '' });
+
+  useEffect(() => {
+    const unsub = listenToAboutFromFirebase((data) => {
+      if (data) setPersonalInfo(data);
+    });
+    return () => unsub();
+  }, []);
+
   return (
     <Section id="contact" title="Get In Touch">
       <div className="grid md:grid-cols-2 gap-12">
@@ -31,20 +40,32 @@ export function Contact() {
               <div className="w-12 h-12 bg-primary-50 dark:bg-primary-900/40 rounded-full flex items-center justify-center">
                 <Mail className="w-5 h-5 text-primary-600 dark:text-primary-400" />
               </div>
-              <span className="text-lg">{personalInfo.email}</span>
+              <span className="text-lg">{personalInfo.email || "hello@example.com"}</span>
             </a>
+            {personalInfo.github && (
             <a href={personalInfo.github} target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
               <div className="w-12 h-12 bg-primary-50 dark:bg-primary-900/40 rounded-full flex items-center justify-center">
                 <FaGithub className="w-5 h-5 text-primary-600 dark:text-primary-400" />
               </div>
               <span className="text-lg">GitHub Profile</span>
             </a>
+            )}
+            {personalInfo.linkedin && (
             <a href={personalInfo.linkedin} target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
               <div className="w-12 h-12 bg-primary-50 dark:bg-primary-900/40 rounded-full flex items-center justify-center">
                 <FaLinkedin className="w-5 h-5 text-primary-600 dark:text-primary-400" />
               </div>
               <span className="text-lg">LinkedIn Profile</span>
             </a>
+            )}
+            {personalInfo.medium && (
+            <a href={personalInfo.medium} target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+              <div className="w-12 h-12 bg-primary-50 dark:bg-primary-900/40 rounded-full flex items-center justify-center">
+                <FaMedium className="w-5 h-5 text-primary-600 dark:text-primary-400" />
+              </div>
+              <span className="text-lg">Medium Blog</span>
+            </a>
+            )}
           </div>
         </motion.div>
 

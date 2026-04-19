@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { getAboutFromFirebase, updateAboutInFirebase } from '../../services/aboutService';
 
 export function ManageAbout() {
-  const [formData, setFormData] = useState({ name: '', role: '', location: '', shortBio: '', longBio: '', email: '' });
+  const [formData, setFormData] = useState({ name: '', role: '', location: '', shortBio: '', longBio: '', email: '', github: '', linkedin: '', medium: '' });
   const [savedStatus, setSavedStatus] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -88,6 +88,24 @@ export function ManageAbout() {
               <textarea required name="longBio" value={formData.longBio || ''} onChange={handleChange} rows="5" className="w-full px-4 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg outline-none text-slate-800 dark:text-slate-100 resize-y"></textarea>
             </div>
 
+          </div>
+          
+          <h3 className="text-xl font-bold text-slate-800 dark:text-white mt-8 mb-4 border-b border-slate-200 dark:border-slate-700 pb-2">Social Media Links</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+             <div>
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">GitHub Profile URL</label>
+              <input type="url" name="github" value={formData.github || ''} onChange={handleChange} placeholder="https://github.com/yourusername" className="w-full px-4 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg outline-none text-slate-800 dark:text-slate-100" />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">LinkedIn Profile URL</label>
+              <input type="url" name="linkedin" value={formData.linkedin || ''} onChange={handleChange} placeholder="https://linkedin.com/in/yourusername" className="w-full px-4 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg outline-none text-slate-800 dark:text-slate-100" />
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Medium Profile URL</label>
+              <input type="url" name="medium" value={formData.medium || ''} onChange={handleChange} placeholder="https://medium.com/@yourusername" className="w-full px-4 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg outline-none text-slate-800 dark:text-slate-100" />
+            </div>
           </div>
           
           <div className="pt-4">

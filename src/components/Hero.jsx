@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { listenToAboutFromFirebase } from '../services/aboutService';
 import { ArrowRight, MousePointer2 } from 'lucide-react';
-import { FaBehance, FaDribbble, FaLinkedinIn } from 'react-icons/fa';
+import { FaGithub, FaMedium, FaLinkedinIn } from 'react-icons/fa';
 
 export function Hero() {
   const [personalInfo, setPersonalInfo] = useState({ name: '', role: '', shortBio: '' });
@@ -139,22 +139,35 @@ export function Hero() {
                 FOLLOW ME ON
               </span>
               <div className="w-[1px] h-12 bg-slate-700 mb-2"></div>
-              <a href="#" className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white hover:bg-blue-500 transition-colors shadow-lg">
-                <FaBehance size={18} />
-              </a>
-              <a href="#" className="w-10 h-10 rounded-full bg-pink-500 flex items-center justify-center text-white hover:bg-pink-400 transition-colors shadow-lg">
-                <FaDribbble size={18} />
-              </a>
-              <a href={personalInfo.linkedin} className="w-10 h-10 rounded-full bg-blue-800 flex items-center justify-center text-white hover:bg-blue-700 transition-colors shadow-lg">
-                <FaLinkedinIn size={18} />
-              </a>
+              
+              {personalInfo.github && (
+                <a href={personalInfo.github} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-white hover:bg-slate-700 transition-colors shadow-lg">
+                  <FaGithub size={18} />
+                </a>
+              )}
+              {personalInfo.medium && (
+                <a href={personalInfo.medium} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-stone-900 flex items-center justify-center text-white hover:bg-stone-800 transition-colors shadow-lg">
+                  <FaMedium size={18} />
+                </a>
+              )}
+              {personalInfo.linkedin && (
+                <a href={personalInfo.linkedin} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white hover:bg-blue-500 transition-colors shadow-lg">
+                  <FaLinkedinIn size={18} />
+                </a>
+              )}
             </div>
             
             {/* Simple Mobile Socials */}
             <div className="flex lg:hidden justify-center gap-6 mt-8">
-              <a href="#" className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-white shadow-lg"><FaBehance size={20} /></a>
-              <a href="#" className="w-12 h-12 rounded-full bg-pink-500 flex items-center justify-center text-white shadow-lg"><FaDribbble size={20} /></a>
-              <a href={personalInfo.linkedin} className="w-12 h-12 rounded-full bg-blue-800 flex items-center justify-center text-white shadow-lg"><FaLinkedinIn size={20} /></a>
+              {personalInfo.github && (
+                <a href={personalInfo.github} target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center text-white shadow-lg"><FaGithub size={20} /></a>
+              )}
+              {personalInfo.medium && (
+                <a href={personalInfo.medium} target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-full bg-stone-900 flex items-center justify-center text-white shadow-lg"><FaMedium size={20} /></a>
+              )}
+              {personalInfo.linkedin && (
+                <a href={personalInfo.linkedin} target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-white shadow-lg"><FaLinkedinIn size={20} /></a>
+              )}
             </div>
           </motion.div>
 
