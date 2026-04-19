@@ -1,12 +1,25 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { useAbout } from '../hooks/useAbout';
+import { listenToAboutFromFirebase } from '../services/aboutService';
 import { ArrowRight, MousePointer2 } from 'lucide-react';
 import { FaBehance, FaDribbble, FaLinkedinIn } from 'react-icons/fa';
 
 export function Hero() {
-  const { aboutInfo } = useAbout();
-  const personalInfo = aboutInfo.name ? aboutInfo : {};
+  const [personalInfo, setPersonalInfo] = useState({ name: '', role: '', shortBio: '' });
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // Connect Hero directly to Firebase cloud payload
+  useEffect(() => {
+    const unsub = listenToAboutFromFirebase((firestoreData) => {
+      if (firestoreData) {
+        setPersonalInfo(firestoreData);
+      }
+      setIsLoading(false);
+    });
+    
+    // Automatically detach the live memory listener when navigating away
+    return () => unsub();
+  }, []);
   return (
     <section id="home" className="relative min-h-screen flex items-center overflow-hidden bg-slate-900 dark:bg-slate-950 pt-20">
       {/* Topographic Background Pattern - simulated with subtle SVGs or gradients */}
@@ -34,15 +47,29 @@ export function Hero() {
             <div>
               <p className="text-blue-500 font-medium mb-4 text-lg">Welcome to my portfolio!</p>
               <h1 className="text-5xl lg:text-7xl font-extrabold tracking-tight text-white mb-2">
-                Hello, my <br className="hidden lg:block"/> name's <span className="text-blue-500">{personalInfo.name}</span>.
+                Hello, my <br className="hidden lg:block"/> name's{' '}
+                {isLoading ? (
+                  <span className="inline-block w-64 h-14 bg-slate-800 animate-pulse rounded-lg align-middle"></span>
+                ) : (
+                  <span className="text-blue-500">{personalInfo.name}</span>
+                )}.
               </h1>
             </div>
             
-            <p className="text-xl text-slate-300 max-w-lg">
-              I'm a <span className="text-white font-semibold">{personalInfo.role}</span>.
-              <br />
-              {personalInfo.shortBio}
-            </p>
+            <div className="text-xl text-slate-300 max-w-lg min-h-[80px]">
+              {isLoading ? (
+                <div className="space-y-3 pt-2">
+                  <div className="w-48 h-6 bg-slate-800 animate-pulse rounded"></div>
+                  <div className="w-full h-4 bg-slate-800 animate-pulse rounded"></div>
+                </div>
+              ) : (
+                <p>
+                  I'm a <span className="text-white font-semibold">{personalInfo.role}</span>.
+                  <br />
+                  {personalInfo.shortBio}
+                </p>
+              )}
+            </div>
             
             <div className="flex flex-wrap items-center gap-6 pt-4">
               <a

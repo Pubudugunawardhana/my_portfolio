@@ -1,28 +1,44 @@
 import React, { useState, useEffect } from 'react';
-import { useAbout } from '../../hooks/useAbout';
+import { getAboutFromFirebase, updateAboutInFirebase } from '../../services/aboutService';
 
 export function ManageAbout() {
-  const { aboutInfo, updateAbout } = useAbout();
-  const [formData, setFormData] = useState({ name: '', role: '', shortBio: '', longBio: '', email: '' });
+  const [formData, setFormData] = useState({ name: '', role: '', location: '', shortBio: '', longBio: '', email: '' });
   const [savedStatus, setSavedStatus] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Sync form data once the hook loads it from localStorage
+  // Sync form data once it loads securely from Firebase Cloud
   useEffect(() => {
-    if (aboutInfo.name) {
-      setFormData(aboutInfo);
-    }
-  }, [aboutInfo]);
+    const fetchExistingBio = async () => {
+      try {
+        const cloudData = await getAboutFromFirebase();
+        if (cloudData) {
+          setFormData(cloudData);
+        }
+      } catch (error) {
+        console.error("ManageAbout fetch error:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchExistingBio();
+  }, []);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
     setSavedStatus(false);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    updateAbout(formData);
-    setSavedStatus(true);
-    setTimeout(() => setSavedStatus(false), 3000);
+    try {
+      await updateAboutInFirebase(formData);
+      setSavedStatus(true);
+      setTimeout(() => setSavedStatus(false), 3000);
+    } catch (error) {
+      console.error("Failed to save profile:", error);
+      alert("Failed to save to cloud. Check console for details.");
+    }
   };
 
   return (
@@ -36,12 +52,20 @@ export function ManageAbout() {
       </div>
 
       <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 mb-10">
+        {isLoading ? (
+           <p className="text-slate-500 font-medium animate-pulse py-8 text-center">Loading Cloud Storage...</p>
+        ) : (
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             
             <div>
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Full Name</label>
               <input required type="text" name="name" value={formData.name || ''} onChange={handleChange} className="w-full px-4 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg outline-none text-slate-800 dark:text-slate-100" />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Location</label>
+              <input required type="text" name="location" value={formData.location || ''} onChange={handleChange} placeholder="e.g. Colombo, Sri Lanka" className="w-full px-4 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg outline-none text-slate-800 dark:text-slate-100" />
             </div>
 
             <div>
@@ -68,10 +92,11 @@ export function ManageAbout() {
           
           <div className="pt-4">
             <button type="submit" className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-sm transition-colors">
-              Save Profile
+              Save Profile to Cloud
             </button>
           </div>
         </form>
+        )}
       </div>
     </div>
   );

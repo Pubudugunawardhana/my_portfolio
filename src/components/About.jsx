@@ -1,14 +1,40 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Section } from './Section';
-import { useAbout } from '../hooks/useAbout';
+import { getAboutFromFirebase } from '../services/aboutService';
 import { MapPin, Calendar, Mail, FileText } from 'lucide-react';
 
 export function About() {
-  const { aboutInfo } = useAbout();
-  const personalInfo = aboutInfo.name ? aboutInfo : {};
+  const [personalInfo, setPersonalInfo] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Hook runs immediately on component mount
+  useEffect(() => {
+    const fetchAboutData = async () => {
+      try {
+        const firestoreData = await getAboutFromFirebase();
+        if (firestoreData) {
+          setPersonalInfo(firestoreData);
+        }
+      } catch (error) {
+        console.error("Failed to load about data from cloud: ", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchAboutData();
+  }, []);
   return (
     <Section id="about" title="About Me" className="bg-gray-50 dark:bg-gray-800/50">
+      
+      {isLoading ? (
+        <div className="flex flex-col items-center justify-center py-20">
+           <div className="w-12 h-12 border-4 border-slate-200 dark:border-slate-700 border-t-purple-500 rounded-full animate-spin"></div>
+           <p className="mt-4 text-slate-500 dark:text-slate-400 font-medium tracking-wide animate-pulse">Loading Bio...</p>
+        </div>
+      ) : (
+
       <div className="grid md:grid-cols-2 gap-12 items-center">
         <motion.div
           initial={{ opacity: 0, x: -30 }}
@@ -45,7 +71,7 @@ export function About() {
           <div className="grid grid-cols-2 gap-6 pt-6 border-t border-gray-200 dark:border-gray-700">
             <div>
               <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Location</h4>
-              <p className="text-gray-600 dark:text-gray-300">San Francisco, CA</p>
+              <p className="text-gray-600 dark:text-gray-300">{personalInfo.location || 'Not Specified'}</p>
             </div>
             <div>
               <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Availability</h4>
@@ -54,6 +80,8 @@ export function About() {
           </div>
         </motion.div>
       </div>
+      
+      )}
     </Section>
   );
 }

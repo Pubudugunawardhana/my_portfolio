@@ -2,7 +2,7 @@
 import { initializeApp } from "firebase/app";
 
 // Import the specific Firestore Database tool from Firebase
-import { getFirestore } from "firebase/firestore";
+import { initializeFirestore } from "firebase/firestore";
 
 // Your Firebase configuration object
 // NOTE: You must replace these placeholder values with the exact keys 
@@ -30,5 +30,6 @@ const firebaseConfig = {
 // Initialize Firebase with your secure config
 const app = initializeApp(firebaseConfig);
 
-// Initialize Cloud Firestore and get a reference to the service
-export const db = getFirestore(app);
+// Initialize Cloud Firestore using initializeFirestore to force 
+// it to read "myportfolio" instead of falling back to default!
+export const db = initializeFirestore(app, {}, "myportfolio");
