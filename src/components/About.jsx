@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Section } from './Section';
 import { getAboutFromFirebase } from '../services/aboutService';
-import { MapPin, Calendar, Mail, FileText } from 'lucide-react';
+import { MapPin, Calendar, Mail, FileText, GraduationCap, BookOpen } from 'lucide-react';
 
 export function About() {
   const [personalInfo, setPersonalInfo] = useState({});
@@ -78,6 +78,40 @@ export function About() {
               <p className="text-green-600 dark:text-green-400">Open to opportunities</p>
             </div>
           </div>
+
+          {/* Education Section */}
+          {(personalInfo.university || personalInfo.school) && (
+          <div className="pt-6 border-t border-gray-200 dark:border-gray-700">
+             <h4 className="font-semibold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+                <GraduationCap className="w-5 h-5 text-primary-500" />
+                Educational Background
+             </h4>
+             <div className="space-y-5">
+               {personalInfo.university && (
+                 <div className="flex gap-4 items-start">
+                    <div className="w-12 h-12 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center shrink-0 border border-primary-200 dark:border-primary-800">
+                       <GraduationCap className="w-6 h-6 text-primary-600 dark:text-primary-400" />
+                    </div>
+                    <div className="pt-1">
+                      <h5 className="font-bold text-gray-900 dark:text-white text-lg">University</h5>
+                      <p className="text-gray-600 dark:text-gray-300">{personalInfo.university}</p>
+                    </div>
+                 </div>
+               )}
+               {personalInfo.school && (
+                 <div className="flex gap-4 items-start">
+                    <div className="w-12 h-12 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center shrink-0 border border-indigo-200 dark:border-indigo-800">
+                       <BookOpen className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                    </div>
+                    <div className="pt-1">
+                      <h5 className="font-bold text-gray-900 dark:text-white text-lg">High School</h5>
+                      <p className="text-gray-600 dark:text-gray-300">{personalInfo.school}</p>
+                    </div>
+                 </div>
+               )}
+             </div>
+          </div>
+          )}
         </motion.div>
       </div>
       

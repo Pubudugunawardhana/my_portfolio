@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { getAboutFromFirebase, updateAboutInFirebase } from '../../services/aboutService';
 
 export function ManageAbout() {
-  const [formData, setFormData] = useState({ name: '', role: '', location: '', shortBio: '', longBio: '', email: '', github: '', linkedin: '', medium: '' });
+  const [formData, setFormData] = useState({ name: '', role: '', location: '', shortBio: '', longBio: '', email: '', github: '', linkedin: '', medium: '', school: '', university: '' });
   const [savedStatus, setSavedStatus] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -105,6 +105,19 @@ export function ManageAbout() {
             <div className="md:col-span-2">
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Medium Profile URL</label>
               <input type="url" name="medium" value={formData.medium || ''} onChange={handleChange} placeholder="https://medium.com/@yourusername" className="w-full px-4 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg outline-none text-slate-800 dark:text-slate-100" />
+            </div>
+          </div>
+
+          <h3 className="text-xl font-bold text-slate-800 dark:text-white mt-8 mb-4 border-b border-slate-200 dark:border-slate-700 pb-2">Educational Background</h3>
+          <div className="grid grid-cols-1 gap-4">
+             <div>
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">University / College</label>
+              <input type="text" name="university" value={formData.university || ''} onChange={handleChange} placeholder="e.g. University of Moratuwa" className="w-full px-4 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg outline-none text-slate-800 dark:text-slate-100" />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">School</label>
+              <input type="text" name="school" value={formData.school || ''} onChange={handleChange} placeholder="e.g. Royal College, Colombo" className="w-full px-4 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg outline-none text-slate-800 dark:text-slate-100" />
             </div>
           </div>
           

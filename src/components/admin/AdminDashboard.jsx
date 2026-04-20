@@ -4,6 +4,7 @@ import { Sidebar } from './Sidebar';
 import { ManageProjects } from './ManageProjects';
 import { ManageSkills } from './ManageSkills';
 import { ManageAbout } from './ManageAbout';
+import { ManageMessages } from './ManageMessages';
 
 export function AdminDashboard() {
   return (
@@ -56,6 +57,7 @@ export function AdminDashboard() {
               <Route path="/projects" element={<ManageProjects />} />
               <Route path="/skills" element={<ManageSkills />} />
               <Route path="/about" element={<ManageAbout />} />
+              <Route path="/messages" element={<ManageMessages />} />
             </Routes>
           </div>
         </main>
