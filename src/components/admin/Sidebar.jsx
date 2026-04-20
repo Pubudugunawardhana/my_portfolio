@@ -1,6 +1,7 @@
 import React from 'react';
-import { Home, FolderOpen, Code, User, MessageSquare } from 'lucide-react';
+import { Home, FolderOpen, Code, User, MessageSquare, LogOut } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { logoutAdmin } from '../../services/authService';
 
 export function Sidebar() {
   const adminLinks = [
@@ -10,6 +11,14 @@ export function Sidebar() {
     { name: 'Manage About', href: '/admin/about', icon: User },
     { name: 'Manage Messages', href: '/admin/messages', icon: MessageSquare },
   ];
+
+  const handleLogout = async () => {
+    try {
+      await logoutAdmin();
+    } catch (error) {
+      console.error("Logout error", error);
+    }
+  };
 
   return (
     <div className="w-64 h-full bg-slate-900 border-r border-slate-800 flex flex-col transition-colors duration-300">
@@ -35,7 +44,14 @@ export function Sidebar() {
         })}
       </nav>
 
-      <div className="p-4 border-t border-slate-800">
+      <div className="p-4 border-t border-slate-800 space-y-3">
+        <button
+          onClick={handleLogout}
+          className="flex items-center justify-center gap-2 w-full px-4 py-2 text-sm font-semibold text-white bg-red-600/90 hover:bg-red-500 rounded-lg transition-colors border border-red-500"
+        >
+          <LogOut className="w-4 h-4" />
+          Log Out
+        </button>
         <Link
           to="/"
           className="flex items-center justify-center w-full px-4 py-2 text-sm font-semibold text-slate-400 bg-slate-800 hover:bg-slate-700 hover:text-white rounded-lg transition-colors border border-slate-700"

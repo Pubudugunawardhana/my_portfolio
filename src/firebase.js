@@ -1,8 +1,9 @@
 // Import the core Firebase App module
 import { initializeApp } from "firebase/app";
 
-// Import the specific Firestore Database tool from Firebase
+// Import Firestore and Auth modules
 import { initializeFirestore } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
 
 // Your Firebase configuration object
 // NOTE: You must replace these placeholder values with the exact keys 
@@ -33,3 +34,6 @@ const app = initializeApp(firebaseConfig);
 // Initialize Cloud Firestore using initializeFirestore to force 
 // it to read "myportfolio" instead of falling back to default!
 export const db = initializeFirestore(app, {}, "myportfolio");
+
+// Initialize Firebase Authentication and export it
+export const auth = getAuth(app);

@@ -1,23 +1,26 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { loginAdmin } from '../../services/authService';
 
 export function Login() {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
+    setIsLoggingIn(true);
+    setError('');
     
-    // Hardcoded simple authentication check
-    if (username === 'admin' && password === 'admin123') {
-      // Set a simple boolean in local storage to remember we're logged in
-      localStorage.setItem('portfolio_auth', 'true');
+    try {
+      await loginAdmin(email, password);
       navigate('/admin');
-    } else {
-      setError('Invalid username or password');
-      setPassword('');
+    } catch (err) {
+      setError('Invalid email or password. Please try again.');
+    } finally {
+      setIsLoggingIn(false);
     }
   };
 
@@ -32,14 +35,14 @@ export function Login() {
 
         <form onSubmit={handleLogin} className="space-y-6">
           <div>
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Username</label>
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Email</label>
             <input 
-              type="text" 
+              type="email" 
               required
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-slate-900 dark:text-white transition-colors"
-              placeholder="admin"
+              placeholder="admin@example.com"
             />
           </div>
 
@@ -63,9 +66,10 @@ export function Login() {
 
           <button 
             type="submit"
-            className="w-full flex items-center justify-center py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-md transition-all"
+            disabled={isLoggingIn}
+            className={`w-full flex items-center justify-center py-3 px-4 text-white font-bold rounded-xl shadow-md transition-all ${isLoggingIn ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700'}`}
           >
-            Access Dashboard
+            {isLoggingIn ? 'Authenticating...' : 'Access Dashboard'}
           </button>
         </form>
 
