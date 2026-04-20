@@ -1,5 +1,5 @@
 // src/services/messageService.js
-import { collection, addDoc, getDocs, query, orderBy } from 'firebase/firestore';
+import { collection, addDoc, getDocs, query, orderBy, doc, deleteDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 
 /**
@@ -49,6 +49,38 @@ export async function getContactMessages() {
     return messagesList;
   } catch (error) {
     console.error("Critical Error fetching messages from Firebase: ", error);
+    throw error;
+  }
+}
+
+/**
+ * Deletes a specific message from the database permanently.
+ * 
+ * @param {string} messageId - The Firestore document ID to delete.
+ */
+export async function deleteContactMessage(messageId) {
+  try {
+    await deleteDoc(doc(db, 'messages', messageId));
+  } catch (error) {
+    console.error("Error deleting message:", error);
+    throw error;
+  }
+}
+
+/**
+ * Toggles the read status of a specific message.
+ * 
+ * @param {string} messageId - The Firestore document ID.
+ * @param {boolean} currentStatus - The current boolean read status.
+ */
+export async function toggleMessageReadStatus(messageId, currentStatus) {
+  try {
+    const messageRef = doc(db, 'messages', messageId);
+    await updateDoc(messageRef, {
+      readStatus: !currentStatus
+    });
+  } catch (error) {
+    console.error("Error toggling message read status:", error);
     throw error;
   }
 }
