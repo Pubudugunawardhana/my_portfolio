@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
 import { ManageProjects } from './ManageProjects';
@@ -6,8 +6,17 @@ import { ManageSkills } from './ManageSkills';
 import { ManageAbout } from './ManageAbout';
 import { ManageMessages } from './ManageMessages';
 import { ManageProfile } from './ManageProfile';
+import { getDashboardOverviewStats } from '../../services/analyticsService';
 
 export function AdminDashboard() {
+  const [stats, setStats] = useState({ views: 0, projects: 0, messages: 0 });
+
+  useEffect(() => {
+    // Fire a parallel fetch on Admin mount
+    getDashboardOverviewStats().then(data => {
+      setStats(data);
+    });
+  }, []);
   return (
     <div className="flex h-screen bg-slate-50 dark:bg-slate-950 font-sans mt-0 selection:bg-blue-500 selection:text-white">
       {/* Sidebar Component */}
@@ -27,19 +36,22 @@ export function AdminDashboard() {
               </p>
             </div>
 
-            {/* Dashboard Cards (Placeholder overview) */}
+            {/* Dashboard Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-              <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700">
+              <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 relative overflow-hidden">
                 <p className="text-sm font-semibold text-slate-500 uppercase tracking-widest mb-1">Total Views</p>
-                <p className="text-4xl font-black text-slate-800 dark:text-white">1,204</p>
+                <p className="text-4xl font-black text-slate-800 dark:text-white">{stats.views.toLocaleString()}</p>
+                <div className="absolute top-0 right-0 p-4 opacity-5 bg-blue-500 rounded-bl-full w-24 h-24 pointer-events-none"></div>
               </div>
-              <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700">
+              <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 relative overflow-hidden">
                 <p className="text-sm font-semibold text-slate-500 uppercase tracking-widest mb-1">Messages</p>
-                <p className="text-4xl font-black text-slate-800 dark:text-white">12</p>
+                <p className="text-4xl font-black text-slate-800 dark:text-white">{stats.messages.toLocaleString()}</p>
+                <div className="absolute top-0 right-0 p-4 opacity-5 bg-green-500 rounded-bl-full w-24 h-24 pointer-events-none"></div>
               </div>
-              <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700">
+              <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 relative overflow-hidden">
                 <p className="text-sm font-semibold text-slate-500 uppercase tracking-widest mb-1">Projects</p>
-                <p className="text-4xl font-black text-slate-800 dark:text-white">3</p>
+                <p className="text-4xl font-black text-slate-800 dark:text-white">{stats.projects.toLocaleString()}</p>
+                <div className="absolute top-0 right-0 p-4 opacity-5 bg-purple-500 rounded-bl-full w-24 h-24 pointer-events-none"></div>
               </div>
             </div>
 

@@ -3,7 +3,7 @@ import { useProjects } from '../../hooks/useProjects';
 import { UploadCloud, Image as ImageIcon } from 'lucide-react';
 
 export function ManageProjects() {
-  const { projects, addProject, editProject, deleteProject } = useProjects();
+  const { projects, isLoading, addProject, editProject, deleteProject } = useProjects();
   
   // Form state
   const [formData, setFormData] = useState({ title: '', description: '', image: '', githubUrl: '', liveUrl: '', tech: '' });
@@ -273,7 +273,13 @@ export function ManageProjects() {
           </div>
         ))}
 
-        {projects.length === 0 && (
+        {isLoading && projects.length === 0 && (
+          <div className="p-8 text-center text-slate-500 animate-pulse font-medium">
+            Loading your projects from the cloud...
+          </div>
+        )}
+
+        {!isLoading && projects.length === 0 && (
           <div className="p-8 text-center bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 text-slate-500">
             No projects found! Use the form above to add one.
           </div>

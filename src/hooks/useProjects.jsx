@@ -9,6 +9,7 @@ import {
 
 export function useProjects() {
   const [projects, setProjects] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     // 1. Instantly check if we need to migrate raw static code into the empty Cloud.
@@ -17,6 +18,7 @@ export function useProjects() {
     // 2. Open the socket! Let Firebase aggressively push new DB rows down into this React state.
     const unsubscribe = listenToProjectsFromFirebase((liveData) => {
       setProjects(liveData);
+      setIsLoading(false);
     });
 
     return () => unsubscribe();
@@ -35,5 +37,5 @@ export function useProjects() {
     await deleteProjectFromFirebase(id);
   };
 
-  return { projects, addProject, editProject, deleteProject };
+  return { projects, isLoading, addProject, editProject, deleteProject };
 }

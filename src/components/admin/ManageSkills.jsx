@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useSkills } from '../../hooks/useSkills';
 
 export function ManageSkills() {
-  const { skills, addSkillCategory, updateSkillCategory, deleteSkillCategory } = useSkills();
+  const { skills, isLoading, addSkillCategory, updateSkillCategory, deleteSkillCategory } = useSkills();
   
   const [formData, setFormData] = useState({ name: '', tech: '' });
   const [editingName, setEditingName] = useState(null);
@@ -115,7 +115,13 @@ export function ManageSkills() {
           </div>
         ))}
 
-        {skills.length === 0 && (
+        {isLoading && skills.length === 0 && (
+          <div className="p-8 text-center text-slate-500 animate-pulse font-medium">
+            Loading your skills from the cloud...
+          </div>
+        )}
+
+        {!isLoading && skills.length === 0 && (
           <div className="p-8 text-center bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 text-slate-500">
             No active skill categories found.
           </div>

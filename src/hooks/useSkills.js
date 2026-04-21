@@ -8,6 +8,7 @@ import {
 
 export function useSkills() {
   const [skills, setSkills] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     // 1. Immediately scan and seed the cloud if it's completely empty!
@@ -16,6 +17,7 @@ export function useSkills() {
     // 2. Attach our live pipeline to the React Local State
     const unsubscribe = listenToSkillsFromFirebase((liveDataArray) => {
       setSkills(liveDataArray);
+      setIsLoading(false);
     });
 
     return () => unsubscribe();
@@ -40,5 +42,5 @@ export function useSkills() {
     await deleteSkillFromFirebase(categoryName);
   };
 
-  return { skills, addSkillCategory, updateSkillCategory, deleteSkillCategory };
+  return { skills, isLoading, addSkillCategory, updateSkillCategory, deleteSkillCategory };
 }

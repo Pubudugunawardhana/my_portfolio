@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { incrementPageViews } from './services/analyticsService';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
 import { About } from './components/About';
@@ -14,6 +15,14 @@ import { Login } from './components/admin/Login';
 import { ProtectedRoute } from './components/admin/ProtectedRoute';
 
 function PortfolioLayout() {
+  useEffect(() => {
+    // Session token ensures a page reload doesn't artificially spike views
+    if (!sessionStorage.getItem('hasVisitedThisSession')) {
+       incrementPageViews();
+       sessionStorage.setItem('hasVisitedThisSession', 'true');
+    }
+  }, []);
+
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300 antialiased selection:bg-primary-500 selection:text-white">
       <Navbar />

@@ -46,10 +46,17 @@ const itemVariants = {
 };
 
 export function Skills() {
-  const { skills } = useSkills();
+  const { skills, isLoading } = useSkills();
 
   return (
     <Section id="skills" title="My Skills">
+      
+      {isLoading ? (
+        <div className="flex flex-col items-center justify-center py-20">
+           <div className="w-12 h-12 border-4 border-slate-200 dark:border-slate-700 border-t-cyan-500 rounded-full animate-spin"></div>
+           <p className="mt-4 text-slate-500 dark:text-slate-400 font-medium tracking-wide animate-pulse">Mapping Skills...</p>
+        </div>
+      ) : (
       <motion.div
         variants={containerVariants}
         initial="hidden"
@@ -79,6 +86,7 @@ export function Skills() {
           );
         })}
       </motion.div>
+      )}
     </Section>
   );
 }
