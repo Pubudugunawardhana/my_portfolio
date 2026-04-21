@@ -6,6 +6,7 @@ import { Hero } from './components/Hero';
 import { About } from './components/About';
 import { Skills } from './components/Skills';
 import { Projects } from './components/Projects';
+import { Certifications } from './components/Certifications';
 import { Contact } from './components/Contact';
 import { Footer } from './components/Footer';
 import { Section } from './components/Section';
@@ -31,6 +32,7 @@ function PortfolioLayout() {
         <About />
         <Skills />
         <Projects />
+        <Certifications />
 
         <Section id="fun-zone" title="Fun Zone" className="bg-slate-50 dark:bg-slate-900/50">
           <MemoryGame />

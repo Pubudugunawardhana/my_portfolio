@@ -6,6 +6,7 @@ import { ManageSkills } from './ManageSkills';
 import { ManageAbout } from './ManageAbout';
 import { ManageMessages } from './ManageMessages';
 import { ManageProfile } from './ManageProfile';
+import { ManageCertifications } from './ManageCertifications';
 import { getDashboardOverviewStats } from '../../services/analyticsService';
 
 export function AdminDashboard() {
@@ -70,6 +71,7 @@ export function AdminDashboard() {
               <Route path="/projects" element={<ManageProjects />} />
               <Route path="/skills" element={<ManageSkills />} />
               <Route path="/about" element={<ManageAbout />} />
+              <Route path="/certifications" element={<ManageCertifications />} />
               <Route path="/messages" element={<ManageMessages />} />
               <Route path="/profile" element={<ManageProfile />} />
             </Routes>
