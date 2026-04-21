@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useProjects } from '../../hooks/useProjects';
+import { UploadCloud, Image as ImageIcon } from 'lucide-react';
 
 export function ManageProjects() {
   const { projects, addProject, editProject, deleteProject } = useProjects();
@@ -8,10 +9,61 @@ export function ManageProjects() {
   const [formData, setFormData] = useState({ title: '', description: '', image: '', githubUrl: '', liveUrl: '', tech: '' });
   // If editingId is null, we are in "Add Mode". If it holds an ID, we are in "Edit Mode".
   const [editingId, setEditingId] = useState(null);
+  const [isCompressing, setIsCompressing] = useState(false);
+  const fileInputRef = useRef(null);
 
-  // Safely handles user typing into any input field
+  // Safely handles user typing into text fields
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (!file.type.match('image.*')) {
+      alert('Please select an image file (JPG, PNG, etc).');
+      return;
+    }
+
+    setIsCompressing(true);
+    
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        // Slightly larger max dimension for projects (800x800) than profile
+        const MAX_WIDTH = 800;
+        const MAX_HEIGHT = 800;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > MAX_WIDTH) {
+            height *= MAX_WIDTH / width;
+            width = MAX_WIDTH;
+          }
+        } else {
+          if (height > MAX_HEIGHT) {
+            width *= MAX_HEIGHT / height;
+            height = MAX_HEIGHT;
+          }
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+
+        const base64Payload = canvas.toDataURL('image/jpeg', 0.7);
+        
+        setFormData((prev) => ({ ...prev, image: base64Payload }));
+        setIsCompressing(false);
+      };
+      img.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleSubmit = (e) => {
@@ -88,16 +140,37 @@ export function ManageProjects() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Image URL</label>
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Project Image</label>
+              
               <input 
-                required 
-                type="url" 
-                name="image" 
-                value={formData.image} 
-                onChange={handleChange} 
-                className="w-full px-4 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-slate-800 dark:text-slate-100"
-                placeholder="https://images.unsplash.com/..." 
+                type="file" 
+                accept="image/*"
+                onChange={handleFileChange}
+                ref={fileInputRef}
+                className="hidden" 
               />
+
+              <div className="flex items-center gap-4">
+                {/* Thumbnail Preview if an image exists */}
+                {formData.image && (
+                  <div className="w-16 h-16 shrink-0 rounded-lg overflow-hidden border-2 border-slate-200 dark:border-slate-700">
+                    <img src={formData.image} alt="preview" className="w-full h-full object-cover" />
+                  </div>
+                )}
+                
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current.click()}
+                  className="flex-1 flex flex-col items-center justify-center py-3 px-4 bg-slate-50 dark:bg-slate-900 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group"
+                >
+                  <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
+                    <UploadCloud size={20} className="group-hover:text-blue-500 transition-colors" />
+                    <span className="font-medium text-sm">
+                      {isCompressing ? 'Compressing...' : (formData.image ? 'Change Image' : 'Select Photo')}
+                    </span>
+                  </div>
+                </button>
+              </div>
             </div>
             <div>
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">GitHub Link</label>

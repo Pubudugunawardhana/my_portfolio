@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Section } from './Section';
-import { getProjectsFromFirebase } from '../services/projectService';
+import { listenToProjectsFromFirebase } from '../services/projectService';
 import { ExternalLink } from 'lucide-react';
 import { FaGithub } from 'react-icons/fa';
 
@@ -9,21 +9,15 @@ export function Projects() {
   const [projects, setProjects] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Hook runs immediately on component mount
+  // Bind strictly to the live Firebase Socket Stream
   useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        const firestoreData = await getProjectsFromFirebase();
-        setProjects(firestoreData);
-      } catch (error) {
-        console.error("Failed to load projects from cloud: ", error);
-        // Fallback to empty gallery gracefully
-      } finally {
-        setIsLoading(false); // Stop loading regardless of success/fail
-      }
-    };
+    const unsub = listenToProjectsFromFirebase((liveData) => {
+      setProjects(liveData);
+      setIsLoading(false);
+    });
     
-    fetchProjects();
+    // Auto-cleanup memory when unmounting
+    return () => unsub();
   }, []);
   return (
     <Section id="projects" title="Featured Projects" className="bg-slate-50 dark:bg-slate-900/50">

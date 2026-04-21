@@ -1,6 +1,7 @@
 // src/services/projectService.js
-import { collection, addDoc, getDocs, doc, updateDoc, deleteDoc } from 'firebase/firestore';
-import { db } from '../firebase'; // Import your configured database instance
+import { collection, addDoc, getDocs, doc, updateDoc, deleteDoc, onSnapshot } from 'firebase/firestore';
+import { db } from '../firebase';
+import { projects as defaultProjects } from '../data/portfolio';
 
 /**
  * Adds a brand new project record directly into your Firebase Firestore cloud database.
@@ -19,9 +20,9 @@ export async function addProjectToFirebase(projectData) {
       title: projectData.title,
       description: projectData.description,
       image: projectData.image,
-      githubLink: projectData.githubLink,
-      
-      // Bonus: It's always best practice to track when a record was created!
+      githubUrl: projectData.githubUrl || "",
+      liveUrl: projectData.liveUrl || "",
+      tech: projectData.tech || [],
       createdAt: new Date().toISOString()
     });
 
@@ -36,29 +37,56 @@ export async function addProjectToFirebase(projectData) {
 }
 
 /**
- * Retrieves all stored project documents from the Firebase Firestore database.
- * 
- * @returns {Promise<Array>} - An array of project objects containing their data and unique Firestore ID.
+ * Attaches a real-time listener to the 'projects' collection.
  */
-export async function getProjectsFromFirebase() {
-  try {
-    const projectsCollectionRef = collection(db, 'projects');
-    
-    // Execute the fetch request to Google's servers
-    const snapshot = await getDocs(projectsCollectionRef);
-
-    // The snapshot returns complex Firebase objects. We need to map through them 
-    // to extract exactly the raw JSON data and the unique ID we actually care about!
+export function listenToProjectsFromFirebase(callback) {
+  const projectsCollectionRef = collection(db, 'projects');
+  
+  const unsubscribe = onSnapshot(projectsCollectionRef, (snapshot) => {
     const projectsList = snapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data()
     }));
+    
+    // Forcefully sort locally by createdAt so newly added projects show up first
+    projectsList.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    
+    callback(projectsList);
+  }, (error) => {
+    console.error("Live Data Stream Error for Projects: ", error);
+  });
+  
+  return unsubscribe;
+}
 
-    return projectsList;
-
+/**
+ * Intelligent single-execution check to aggressively upload static components if 
+ * the cloud bucket is entirely empty
+ */
+export async function checkAndSeedProjectsIntelligently() {
+  try {
+    const projectsCollectionRef = collection(db, 'projects');
+    const snapshot = await getDocs(projectsCollectionRef);
+    if (snapshot.empty) {
+      console.log("No projects found in Database! Initiating Auto-Seed Protocol...");
+      
+      const seedPromises = defaultProjects.map(projectData => {
+        return addDoc(projectsCollectionRef, {
+          title: projectData.title,
+          description: projectData.description,
+          image: projectData.image,
+          githubUrl: projectData.githubUrl || "",
+          liveUrl: projectData.liveUrl || "",
+          tech: projectData.tech || [],
+          createdAt: new Date().toISOString()
+        });
+      });
+      
+      await Promise.all(seedPromises);
+      console.log("Projects Auto-Seed successful!");
+    }
   } catch (error) {
-    console.error("Critical Error fetching projects from Firebase: ", error);
-    throw error;
+    console.error("Auto-Seed failed: ", error);
   }
 }
 
