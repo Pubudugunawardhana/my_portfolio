@@ -113,11 +113,19 @@ export function Hero() {
               {/* Inner glowing ring */}
               <div className="absolute inset-0 border-2 border-blue-500 rounded-full z-20 m-2 pointer-events-none"></div>
               
-              <img
-                src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1000&auto=format&fit=crop"
-                alt="Portrait"
-                className="w-full h-full object-cover z-10 relative"
-              />
+              {isLoading ? (
+                <div className="w-full h-full bg-slate-800 animate-pulse z-10 relative"></div>
+              ) : (
+                <img
+                  src={personalInfo.profileImage || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1000&auto=format&fit=crop"}
+                  alt="Portrait"
+                  className="w-full h-full object-cover z-10 relative"
+                  onError={(e) => {
+                    e.target.onerror = null; 
+                    e.target.src = "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1000&auto=format&fit=crop";
+                  }}
+                />
+              )}
             </div>
 
             {/* Floating Elements (Simulating 3D objects) */}

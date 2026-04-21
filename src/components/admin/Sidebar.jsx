@@ -1,14 +1,15 @@
 import React from 'react';
-import { Home, FolderOpen, Code, User, MessageSquare, LogOut } from 'lucide-react';
+import { Home, FolderOpen, Code, User, MessageSquare, LogOut, Camera } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { logoutAdmin } from '../../services/authService';
 
 export function Sidebar() {
   const adminLinks = [
-    { name: 'Dashboard', href: '/admin', icon: Home },
+    { name: 'Dashboard Home', href: '/admin', icon: Home },
     { name: 'Manage Projects', href: '/admin/projects', icon: FolderOpen },
     { name: 'Manage Skills', href: '/admin/skills', icon: Code },
     { name: 'Manage About', href: '/admin/about', icon: User },
+    { name: 'Manage Profile', href: '/admin/profile', icon: Camera },
     { name: 'Manage Messages', href: '/admin/messages', icon: MessageSquare },
   ];
 
