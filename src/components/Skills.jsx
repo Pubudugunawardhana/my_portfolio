@@ -2,8 +2,9 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Section } from './Section';
 import { useSkills } from '../hooks/useSkills';
-import { FaReact, FaJs, FaHtml5, FaCss3Alt, FaNodeJs, FaPython } from 'react-icons/fa';
-import { SiExpress, SiDjango, SiPostgresql, SiMongodb, SiRedis, SiFigma, SiFramer } from 'react-icons/si';
+import { FaReact, FaJs, FaHtml5, FaCss3Alt, FaNodeJs, FaPython, FaJava } from 'react-icons/fa';
+import { SiExpress, SiDjango, SiPostgresql, SiMongodb, SiRedis, SiFigma, SiFramer, SiTailwindcss, SiMysql, SiFirebase, SiC, SiPhp } from 'react-icons/si';
+import { TbApi } from 'react-icons/tb';
 
 const getTechIcon = (tech) => {
   const icons = {
@@ -19,7 +20,14 @@ const getTechIcon = (tech) => {
     'MongoDB': <SiMongodb className="w-4 h-4 text-green-500 mr-3" />,
     'Redis': <SiRedis className="w-4 h-4 text-red-500 mr-3" />,
     'Figma': <SiFigma className="w-4 h-4 text-pink-500 mr-3" />,
-    'Framer': <SiFramer className="w-4 h-4 text-blue-500 mr-3" />
+    'Framer': <SiFramer className="w-4 h-4 text-blue-500 mr-3" />,
+    'Tailwind CSS': <SiTailwindcss className="w-4 h-4 text-cyan-500 mr-3" />,
+    'MySQL': <SiMysql className="w-4 h-4 text-blue-600 mr-3" />,
+    'Firebase': <SiFirebase className="w-4 h-4 text-yellow-500 mr-3" />,
+    'C': <SiC className="w-4 h-4 text-blue-600 mr-3" />,
+    'Java': <FaJava className="w-4 h-4 text-red-500 mr-3" />,
+    'PHP': <SiPhp className="w-4 h-4 text-indigo-500 mr-3" />,
+    'REST APIs': <TbApi className="w-4 h-4 text-emerald-500 mr-3" />
   };
   return icons[tech] || <span className="w-2 h-2 bg-primary-400 dark:bg-primary-500 rounded-full mr-3"></span>;
 };
