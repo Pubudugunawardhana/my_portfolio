@@ -1,13 +1,24 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Section } from './Section';
 import { listenToProjectsFromFirebase } from '../services/projectService';
-import { ExternalLink } from 'lucide-react';
+import { ExternalLink, ChevronLeft, ChevronRight } from 'lucide-react';
 import { FaGithub } from 'react-icons/fa';
 
 export function Projects() {
   const [projects, setProjects] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const scrollContainerRef = useRef(null);
+
+  const scroll = (direction) => {
+    if (scrollContainerRef.current) {
+      const scrollAmount = 400;
+      scrollContainerRef.current.scrollBy({ 
+        left: direction === 'left' ? -scrollAmount : scrollAmount, 
+        behavior: 'smooth' 
+      });
+    }
+  };
 
   // Bind strictly to the live Firebase Socket Stream
   useEffect(() => {
@@ -30,17 +41,41 @@ export function Projects() {
         </div>
       ) : (
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {projects.map((project, index) => (
-          <motion.div
-            key={project.id || project.title}
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-50px" }}
-            transition={{ duration: 0.5, delay: index * 0.1 }}
-            className="group flex flex-col bg-white dark:bg-slate-800 rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl border border-slate-100 dark:border-slate-700 transition-all duration-300"
+      <div className="relative group/slider">
+        {/* Desktop Navigation Buttons */}
+        <div className="absolute top-1/2 -left-4 lg:-left-6 transform -translate-y-1/2 z-10 hidden md:block opacity-0 group-hover/slider:opacity-100 transition-opacity duration-300">
+          <button 
+            onClick={() => scroll('left')}
+            className="p-3 bg-white dark:bg-slate-800 rounded-full shadow-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 hover:scale-110 active:scale-95 transition-all"
           >
-            {/* Image Container with Hover zoom effect */}
+            <ChevronLeft size={24} />
+          </button>
+        </div>
+        
+        <div className="absolute top-1/2 -right-4 lg:-right-6 transform -translate-y-1/2 z-10 hidden md:block opacity-0 group-hover/slider:opacity-100 transition-opacity duration-300">
+          <button 
+            onClick={() => scroll('right')}
+            className="p-3 bg-white dark:bg-slate-800 rounded-full shadow-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 hover:scale-110 active:scale-95 transition-all"
+          >
+            <ChevronRight size={24} />
+          </button>
+        </div>
+
+        {/* Scrolling Container */}
+        <div 
+          ref={scrollContainerRef}
+          className="flex overflow-x-auto gap-8 pb-8 pt-4 snap-x snap-mandatory scroll-smooth [-ms-overflow-style:'none'] [scrollbar-width:'none'] [&::-webkit-scrollbar]:hidden px-2 md:px-4"
+        >
+          {projects.map((project, index) => (
+            <motion.div
+              key={project.id || project.title}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
+              className="w-full sm:w-[calc(50%-16px)] lg:w-[calc(33.333%-21.33px)] flex-shrink-0 snap-start group flex flex-col bg-white dark:bg-slate-800 rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl border border-slate-100 dark:border-slate-700 transition-all duration-300"
+            >
+              {/* Image Container with Hover zoom effect */}
             <div className="relative h-56 overflow-hidden">
               <div className="absolute inset-0 bg-blue-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10" />
               <img
@@ -97,11 +132,12 @@ export function Projects() {
           </motion.div>
         ))}
         
-        {projects.length === 0 && !isLoading && (
-          <div className="col-span-full py-12 text-center text-slate-500">
-            No projects found in your database. Open the Admin Panel to create some!
-          </div>
-        )}
+          {projects.length === 0 && !isLoading && (
+            <div className="w-full py-12 text-center text-slate-500">
+              No projects found in your database. Open the Admin Panel to create some!
+            </div>
+          )}
+        </div>
       </div>
       
       )} {/* Close Loading ternary wrapper */}
