@@ -80,7 +80,7 @@ export function Blogs() {
           <p>Failed to load blogs. Please check back later.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="flex overflow-x-auto gap-8 pb-8 snap-x snap-mandatory scroll-smooth [-ms-overflow-style:'none'] [scrollbar-width:'none'] [&::-webkit-scrollbar]:hidden px-2">
           {blogs.map((blog, index) => (
             <motion.div
               key={blog.link}
@@ -88,7 +88,7 @@ export function Blogs() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-50px" }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="group flex flex-col bg-white dark:bg-slate-900 rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl border border-slate-100 dark:border-slate-800 transition-all duration-300"
+              className="min-w-[300px] max-w-[300px] sm:min-w-[350px] sm:max-w-[350px] md:min-w-[400px] md:max-w-[400px] flex-shrink-0 snap-start group flex flex-col bg-white dark:bg-slate-900 rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl border border-slate-100 dark:border-slate-800 transition-all duration-300"
             >
               {/* Blog Thumbnail */}
               <div className="relative h-56 bg-slate-100 dark:bg-slate-800 overflow-hidden">
