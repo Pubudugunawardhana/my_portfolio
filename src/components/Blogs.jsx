@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Section } from './Section';
-import { ExternalLink, BookOpen, Calendar } from 'lucide-react';
+import { ExternalLink, BookOpen, Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
 
 // Replace with actual Medium username
 const MEDIUM_USERNAME = '@pubudugunawardhana23';
@@ -10,6 +10,17 @@ export function Blogs() {
   const [blogs, setBlogs] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const scrollContainerRef = useRef(null);
+
+  const scroll = (direction) => {
+    if (scrollContainerRef.current) {
+      const scrollAmount = 400;
+      scrollContainerRef.current.scrollBy({ 
+        left: direction === 'left' ? -scrollAmount : scrollAmount, 
+        behavior: 'smooth' 
+      });
+    }
+  };
 
   useEffect(() => {
     const fetchBlogs = async () => {
@@ -80,71 +91,96 @@ export function Blogs() {
           <p>Failed to load blogs. Please check back later.</p>
         </div>
       ) : (
-        <div className="flex overflow-x-auto gap-8 pb-8 snap-x snap-mandatory scroll-smooth [-ms-overflow-style:'none'] [scrollbar-width:'none'] [&::-webkit-scrollbar]:hidden px-2">
-          {blogs.map((blog, index) => (
-            <motion.div
-              key={blog.link}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="min-w-[300px] max-w-[300px] sm:min-w-[350px] sm:max-w-[350px] md:min-w-[400px] md:max-w-[400px] flex-shrink-0 snap-start group flex flex-col bg-white dark:bg-slate-900 rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl border border-slate-100 dark:border-slate-800 transition-all duration-300"
+        <div className="relative group/slider">
+          {/* Desktop Navigation Buttons */}
+          <div className="absolute top-1/2 -left-4 lg:-left-6 transform -translate-y-1/2 z-10 hidden md:block opacity-0 group-hover/slider:opacity-100 transition-opacity duration-300">
+            <button 
+              onClick={() => scroll('left')}
+              className="p-3 bg-white dark:bg-slate-800 rounded-full shadow-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 hover:scale-110 active:scale-95 transition-all"
             >
-              {/* Blog Thumbnail */}
-              <div className="relative h-56 bg-slate-100 dark:bg-slate-800 overflow-hidden">
-                <div className="absolute inset-0 bg-blue-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10" />
-                {blog.thumbnail ? (
-                  <img
-                    src={blog.thumbnail}
-                    alt={blog.title}
-                    className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500 ease-in-out"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <BookOpen className="w-16 h-16 text-slate-300 dark:text-slate-700 transform group-hover:scale-110 group-hover:text-blue-400 transition-all duration-500 ease-in-out" />
-                  </div>
-                )}
-              </div>
-              
-              {/* Blog Content */}
-              <div className="flex flex-col flex-grow p-6 sm:p-8 space-y-4">
-                
-                {/* Meta details */}
-                <div className="flex items-center justify-between text-xs font-semibold text-slate-500 dark:text-slate-400">
-                  <div className="flex items-center gap-2">
-                    <Calendar size={14} />
-                    <span>{blog.pubDate}</span>
-                  </div>
-                  {blog.categories.length > 0 && (
-                    <span className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 px-2 py-1 rounded-full">
-                      {blog.categories[0]}
-                    </span>
+              <ChevronLeft size={24} />
+            </button>
+          </div>
+          
+          <div className="absolute top-1/2 -right-4 lg:-right-6 transform -translate-y-1/2 z-10 hidden md:block opacity-0 group-hover/slider:opacity-100 transition-opacity duration-300">
+            <button 
+              onClick={() => scroll('right')}
+              className="p-3 bg-white dark:bg-slate-800 rounded-full shadow-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 hover:scale-110 active:scale-95 transition-all"
+            >
+              <ChevronRight size={24} />
+            </button>
+          </div>
+
+          {/* Scrolling Container */}
+          <div 
+            ref={scrollContainerRef}
+            className="flex overflow-x-auto gap-8 pb-8 pt-4 snap-x snap-mandatory scroll-smooth [-ms-overflow-style:'none'] [scrollbar-width:'none'] [&::-webkit-scrollbar]:hidden px-2 md:px-4"
+          >
+            {blogs.map((blog, index) => (
+              <motion.div
+                key={blog.link}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                className="w-full sm:w-[calc(50%-16px)] lg:w-[calc(33.333%-21.33px)] flex-shrink-0 snap-start group flex flex-col bg-white dark:bg-slate-900 rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl border border-slate-100 dark:border-slate-800 transition-all duration-300"
+              >
+                {/* Blog Thumbnail */}
+                <div className="relative h-56 bg-slate-100 dark:bg-slate-800 overflow-hidden">
+                  <div className="absolute inset-0 bg-blue-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10" />
+                  {blog.thumbnail ? (
+                    <img
+                      src={blog.thumbnail}
+                      alt={blog.title}
+                      className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500 ease-in-out"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <BookOpen className="w-16 h-16 text-slate-300 dark:text-slate-700 transform group-hover:scale-110 group-hover:text-blue-400 transition-all duration-500 ease-in-out" />
+                    </div>
                   )}
                 </div>
+                
+                {/* Blog Content */}
+                <div className="flex flex-col flex-grow p-6 sm:p-8 space-y-4">
+                  
+                  {/* Meta details */}
+                  <div className="flex items-center justify-between text-xs font-semibold text-slate-500 dark:text-slate-400">
+                    <div className="flex items-center gap-2">
+                      <Calendar size={14} />
+                      <span>{blog.pubDate}</span>
+                    </div>
+                    {blog.categories.length > 0 && (
+                      <span className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 px-2 py-1 rounded-full">
+                        {blog.categories[0]}
+                      </span>
+                    )}
+                  </div>
 
-                <h3 className="text-xl font-bold text-slate-800 dark:text-white group-hover:text-blue-500 transition-colors line-clamp-2">
-                  {blog.title}
-                </h3>
-                
-                <p className="text-sm text-slate-600 dark:text-slate-400 line-clamp-3 flex-grow">
-                  {blog.description}
-                </p>
-                
-                {/* Footer Link */}
-                <div className="pt-6 mt-auto border-t border-slate-100 dark:border-slate-800">
-                  <a
-                    href={blog.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 text-sm font-bold text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
-                  >
-                    <span>Read on Medium</span>
-                    <ExternalLink className="w-4 h-4" />
-                  </a>
+                  <h3 className="text-xl font-bold text-slate-800 dark:text-white group-hover:text-blue-500 transition-colors line-clamp-2">
+                    {blog.title}
+                  </h3>
+                  
+                  <p className="text-sm text-slate-600 dark:text-slate-400 line-clamp-3 flex-grow">
+                    {blog.description}
+                  </p>
+                  
+                  {/* Footer Link */}
+                  <div className="pt-6 mt-auto border-t border-slate-100 dark:border-slate-800">
+                    <a
+                      href={blog.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 text-sm font-bold text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
+                    >
+                      <span>Read on Medium</span>
+                      <ExternalLink className="w-4 h-4" />
+                    </a>
+                  </div>
                 </div>
-              </div>
-            </motion.div>
-          ))}
+              </motion.div>
+            ))}
+          </div>
         </div>
       )}
     </Section>
