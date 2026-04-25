@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { getAboutFromFirebase, updateAboutInFirebase } from '../../services/aboutService';
-import { Save, Image as ImageIcon, UploadCloud } from 'lucide-react';
+import { Save, Image as ImageIcon, UploadCloud, Trash2 } from 'lucide-react';
 
 export function ManageProfile() {
   const [profileImage, setProfileImage] = useState('');
@@ -241,6 +241,15 @@ export function ManageProfile() {
                     <ImageIcon className="text-slate-400 dark:text-slate-600 w-16 h-16 opacity-50" />
                   )}
                 </div>
+                {profileImage && (
+                  <button 
+                    type="button" 
+                    onClick={() => setProfileImage('')}
+                    className="mt-4 text-sm font-bold text-red-500 hover:text-red-600 dark:hover:text-red-400 flex items-center gap-1.5 transition-colors px-3 py-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20"
+                  >
+                    <Trash2 size={16} /> Remove Photo
+                  </button>
+                )}
               </div>
             </div>
 
@@ -290,6 +299,15 @@ export function ManageProfile() {
                     <ImageIcon className="text-slate-400 dark:text-slate-600 w-10 h-10 opacity-50" />
                   )}
                 </div>
+                {coverImage && (
+                  <button 
+                    type="button" 
+                    onClick={() => setCoverImage('')}
+                    className="mt-4 text-sm font-bold text-red-500 hover:text-red-600 dark:hover:text-red-400 flex items-center gap-1.5 transition-colors px-3 py-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20"
+                  >
+                    <Trash2 size={16} /> Remove Cover
+                  </button>
+                )}
               </div>
             </div>
 
@@ -336,6 +354,13 @@ export function ManageProfile() {
                       </div>
                       <p className="font-bold text-slate-700 dark:text-slate-200">CV Ready for Download</p>
                       <p className="text-xs text-slate-500 mt-1">Your PDF is securely stored.</p>
+                      <button 
+                        type="button" 
+                        onClick={() => setResumeFile('')}
+                        className="mt-4 text-sm font-bold text-red-500 hover:text-red-600 dark:hover:text-red-400 flex items-center gap-1.5 transition-colors px-3 py-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20"
+                      >
+                        <Trash2 size={16} /> Remove CV
+                      </button>
                     </>
                   ) : (
                     <>
