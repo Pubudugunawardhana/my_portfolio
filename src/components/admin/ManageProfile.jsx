@@ -4,18 +4,22 @@ import { Save, Image as ImageIcon, UploadCloud } from 'lucide-react';
 
 export function ManageProfile() {
   const [profileImage, setProfileImage] = useState('');
+  const [coverImage, setCoverImage] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [isCompressing, setIsCompressing] = useState(false);
+  const [isCompressingCover, setIsCompressingCover] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
   const fileInputRef = useRef(null);
+  const coverInputRef = useRef(null);
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
         const data = await getAboutFromFirebase();
-        if (data && data.profileImage) {
-          setProfileImage(data.profileImage);
+        if (data) {
+          if (data.profileImage) setProfileImage(data.profileImage);
+          if (data.coverImage) setCoverImage(data.coverImage);
         }
       } catch (error) {
         console.error("Failed to load profile settings.", error);
@@ -79,14 +83,62 @@ export function ManageProfile() {
     reader.readAsDataURL(file);
   };
 
+  const handleCoverChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (!file.type.match('image.*')) {
+      alert('Please select an image file (JPG, PNG, etc).');
+      return;
+    }
+
+    setIsCompressingCover(true);
+    
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        // Banner aspect ratio (wide)
+        const MAX_WIDTH = 1200;
+        const MAX_HEIGHT = 600;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > MAX_WIDTH) {
+            height *= MAX_WIDTH / width;
+            width = MAX_WIDTH;
+          }
+        } else {
+          if (height > MAX_HEIGHT) {
+            width *= MAX_HEIGHT / height;
+            height = MAX_HEIGHT;
+          }
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+
+        const base64Payload = canvas.toDataURL('image/jpeg', 0.8);
+        setCoverImage(base64Payload);
+        setIsCompressingCover(false);
+      };
+      img.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSaving(true);
     setSuccessMsg('');
     
     try {
-      await updateAboutInFirebase({ profileImage });
-      setSuccessMsg('Profile Image uploaded successfully!');
+      await updateAboutInFirebase({ profileImage, coverImage });
+      setSuccessMsg('Images saved successfully!');
       setTimeout(() => setSuccessMsg(''), 3000);
     } catch (error) {
       alert("Failed to save profile image.");
@@ -178,7 +230,55 @@ export function ManageProfile() {
                   )}
                 </div>
               </div>
+            </div>
 
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start mt-12 pt-12 border-t border-slate-200 dark:border-slate-800">
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2 border-b border-slate-200 dark:border-slate-700 pb-2">
+                    Cover Banner Photo
+                  </label>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mb-4 leading-relaxed">
+                    Select a wide landscape photo for your background banner.
+                  </p>
+                  
+                  <input 
+                    type="file" 
+                    accept="image/*"
+                    onChange={handleCoverChange}
+                    ref={coverInputRef}
+                    className="hidden" 
+                  />
+                  
+                  <button
+                    type="button"
+                    onClick={() => coverInputRef.current.click()}
+                    className="w-full flex flex-col items-center justify-center py-8 px-4 bg-slate-50 dark:bg-slate-900 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group cursor-pointer"
+                  >
+                    <UploadCloud className="w-10 h-10 text-purple-500 mb-3 group-hover:scale-110 transition-transform" />
+                    <span className="font-medium text-slate-700 dark:text-slate-300">
+                      {isCompressingCover ? 'Compressing Image...' : 'Click to select cover file'}
+                    </span>
+                    <span className="text-xs text-slate-500 mt-1">PNG, JPG, JPEG</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Cover Image Preview */}
+              <div className="bg-slate-50 dark:bg-slate-900/50 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 flex flex-col items-center justify-center w-full h-full min-h-[250px]">
+                <p className="text-sm font-bold text-slate-500 dark:text-slate-400 mb-4 uppercase tracking-wider">Banner Preview</p>
+                <div className="w-full max-w-sm h-32 rounded-xl border-4 border-slate-300 dark:border-slate-600 shadow-xl overflow-hidden bg-slate-200 dark:bg-slate-800 flex items-center justify-center">
+                  {coverImage ? (
+                    <img 
+                      src={coverImage} 
+                      alt="Cover Preview" 
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <ImageIcon className="text-slate-400 dark:text-slate-600 w-10 h-10 opacity-50" />
+                  )}
+                </div>
+              </div>
             </div>
           </form>
         )}
