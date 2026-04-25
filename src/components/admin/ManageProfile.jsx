@@ -5,13 +5,16 @@ import { Save, Image as ImageIcon, UploadCloud } from 'lucide-react';
 export function ManageProfile() {
   const [profileImage, setProfileImage] = useState('');
   const [coverImage, setCoverImage] = useState('');
+  const [resumeFile, setResumeFile] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [isCompressing, setIsCompressing] = useState(false);
   const [isCompressingCover, setIsCompressingCover] = useState(false);
+  const [isUploadingResume, setIsUploadingResume] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
   const fileInputRef = useRef(null);
   const coverInputRef = useRef(null);
+  const resumeInputRef = useRef(null);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -20,6 +23,7 @@ export function ManageProfile() {
         if (data) {
           if (data.profileImage) setProfileImage(data.profileImage);
           if (data.coverImage) setCoverImage(data.coverImage);
+          if (data.resumeFile) setResumeFile(data.resumeFile);
         }
       } catch (error) {
         console.error("Failed to load profile settings.", error);
@@ -131,14 +135,38 @@ export function ManageProfile() {
     reader.readAsDataURL(file);
   };
 
+  const handleResumeChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (file.type !== 'application/pdf') {
+      alert('Please select a PDF file.');
+      return;
+    }
+
+    if (file.size > 2 * 1024 * 1024) { // 2MB limit
+       alert('File is too large. Please upload a PDF under 2MB.');
+       return;
+    }
+
+    setIsUploadingResume(true);
+    
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setResumeFile(event.target.result); // Base64 representation of PDF
+      setIsUploadingResume(false);
+    };
+    reader.readAsDataURL(file);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSaving(true);
     setSuccessMsg('');
     
     try {
-      await updateAboutInFirebase({ profileImage, coverImage });
-      setSuccessMsg('Images saved successfully!');
+      await updateAboutInFirebase({ profileImage, coverImage, resumeFile });
+      setSuccessMsg('Profile settings saved successfully!');
       setTimeout(() => setSuccessMsg(''), 3000);
     } catch (error) {
       alert("Failed to save profile image.");
@@ -265,6 +293,62 @@ export function ManageProfile() {
               </div>
             </div>
 
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start mt-12 pt-12 border-t border-slate-200 dark:border-slate-800">
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2 border-b border-slate-200 dark:border-slate-700 pb-2">
+                    Resume / CV (PDF)
+                  </label>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mb-4 leading-relaxed">
+                    Upload your professional CV. This will be available for download in the About section. (Max size: 2MB)
+                  </p>
+                  
+                  <input 
+                    type="file" 
+                    accept="application/pdf"
+                    onChange={handleResumeChange}
+                    ref={resumeInputRef}
+                    className="hidden" 
+                  />
+                  
+                  <button
+                    type="button"
+                    onClick={() => resumeInputRef.current.click()}
+                    className="w-full flex flex-col items-center justify-center py-8 px-4 bg-slate-50 dark:bg-slate-900 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group cursor-pointer"
+                  >
+                    <UploadCloud className="w-10 h-10 text-emerald-500 mb-3 group-hover:scale-110 transition-transform" />
+                    <span className="font-medium text-slate-700 dark:text-slate-300">
+                      {isUploadingResume ? 'Processing PDF...' : 'Click to select PDF file'}
+                    </span>
+                    <span className="text-xs text-slate-500 mt-1">PDF only</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Resume Preview/Status */}
+              <div className="bg-slate-50 dark:bg-slate-900/50 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 flex flex-col items-center justify-center w-full h-full min-h-[200px]">
+                <p className="text-sm font-bold text-slate-500 dark:text-slate-400 mb-4 uppercase tracking-wider">CV Status</p>
+                <div className="flex flex-col items-center justify-center text-center">
+                  {resumeFile ? (
+                    <>
+                      <div className="w-16 h-16 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-full flex items-center justify-center mb-3">
+                        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                      </div>
+                      <p className="font-bold text-slate-700 dark:text-slate-200">CV Ready for Download</p>
+                      <p className="text-xs text-slate-500 mt-1">Your PDF is securely stored.</p>
+                    </>
+                  ) : (
+                    <>
+                      <div className="w-16 h-16 bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-600 rounded-full flex items-center justify-center mb-3">
+                        <span className="font-bold">?</span>
+                      </div>
+                      <p className="font-bold text-slate-500 dark:text-slate-400">No CV Uploaded</p>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+
             <div className="flex flex-col sm:flex-row items-center gap-4 justify-end mt-12 pt-8 border-t border-slate-200 dark:border-slate-800">
               {successMsg && (
                 <p className="text-sm font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 px-4 py-3 rounded-xl">
@@ -277,7 +361,7 @@ export function ManageProfile() {
                 className={`flex items-center gap-2 px-10 py-3.5 text-white font-bold rounded-xl shadow-md transition-all ${isSaving ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700'}`}
               >
                 <Save size={20} />
-                {isSaving ? 'Saving...' : 'Save Images'}
+                {isSaving ? 'Saving...' : 'Save Settings'}
               </button>
             </div>
           </form>
