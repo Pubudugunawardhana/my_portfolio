@@ -193,22 +193,6 @@ export function ManageProfile() {
                   </button>
                 </div>
 
-                <div className="pt-2">
-                  <button 
-                    type="submit" 
-                    disabled={isSaving}
-                    className={`flex items-center gap-2 px-8 py-3 text-white font-bold rounded-xl shadow-md transition-all ${isSaving ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700'}`}
-                  >
-                    <Save size={18} />
-                    {isSaving ? 'Saving...' : 'Save Avatar'}
-                  </button>
-                  
-                  {successMsg && (
-                    <p className="mt-3 text-sm font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 px-3 py-1.5 rounded-md inline-block">
-                      {successMsg}
-                    </p>
-                  )}
-                </div>
               </div>
 
               {/* Dynamic Image Preview */}
@@ -279,6 +263,22 @@ export function ManageProfile() {
                   )}
                 </div>
               </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-center gap-4 justify-end mt-12 pt-8 border-t border-slate-200 dark:border-slate-800">
+              {successMsg && (
+                <p className="text-sm font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 px-4 py-3 rounded-xl">
+                  {successMsg}
+                </p>
+              )}
+              <button 
+                type="submit" 
+                disabled={isSaving}
+                className={`flex items-center gap-2 px-10 py-3.5 text-white font-bold rounded-xl shadow-md transition-all ${isSaving ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700'}`}
+              >
+                <Save size={20} />
+                {isSaving ? 'Saving...' : 'Save Images'}
+              </button>
             </div>
           </form>
         )}
