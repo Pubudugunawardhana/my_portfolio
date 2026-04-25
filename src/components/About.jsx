@@ -47,8 +47,14 @@ export function About() {
             <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl blur opacity-25 group-hover:opacity-60 transition duration-1000 group-hover:duration-200"></div>
             
             <div className="relative bg-white dark:bg-slate-900 rounded-3xl shadow-xl overflow-hidden border border-slate-100 dark:border-slate-800 flex flex-col items-center">
-            {/* Gradient Banner */}
-            <div className="w-full h-32 bg-gradient-to-r from-blue-300 via-indigo-400 to-purple-400 dark:from-blue-600 dark:via-indigo-700 dark:to-purple-800"></div>
+            {/* Cover Banner */}
+            <div className="w-full h-32 bg-slate-200 dark:bg-slate-800 relative overflow-hidden">
+               {personalInfo.coverImage ? (
+                 <img src={personalInfo.coverImage} alt="Cover" className="w-full h-full object-cover" />
+               ) : (
+                 <div className="w-full h-full bg-gradient-to-r from-blue-300 via-indigo-400 to-purple-400 dark:from-blue-600 dark:via-indigo-700 dark:to-purple-800"></div>
+               )}
+            </div>
             
             <div className="px-6 pb-8 flex flex-col items-center w-full relative">
               {/* Profile Avatar overlapping the banner, centered */}

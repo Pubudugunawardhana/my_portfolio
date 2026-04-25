@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { getAboutFromFirebase, updateAboutInFirebase } from '../../services/aboutService';
 
 export function ManageAbout() {
-  const [formData, setFormData] = useState({ name: '', role: '', location: '', shortBio: '', longBio: '', email: '', github: '', linkedin: '', medium: '', school: '', university: '', profileImage: '' });
+  const [formData, setFormData] = useState({ name: '', role: '', location: '', shortBio: '', longBio: '', email: '', github: '', linkedin: '', medium: '', school: '', university: '', profileImage: '', coverImage: '' });
   const [savedStatus, setSavedStatus] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -66,6 +66,11 @@ export function ManageAbout() {
             <div>
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Profile Image URL</label>
               <input type="url" name="profileImage" value={formData.profileImage || ''} onChange={handleChange} placeholder="https://example.com/my-photo.jpg" className="w-full px-4 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg outline-none text-slate-800 dark:text-slate-100" />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Cover Image URL</label>
+              <input type="url" name="coverImage" value={formData.coverImage || ''} onChange={handleChange} placeholder="https://example.com/my-banner.jpg" className="w-full px-4 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg outline-none text-slate-800 dark:text-slate-100" />
             </div>
 
             <div>
