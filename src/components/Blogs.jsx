@@ -25,40 +25,55 @@ export function Blogs() {
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
-        const rssUrl = `https://medium.com/feed/${MEDIUM_USERNAME}`;
-        const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`;
+        // We use allorigins with disableCache and a timestamp to completely bypass all caches!
+        const timestamp = new Date().getTime();
+        const rssUrl = `https://medium.com/feed/${MEDIUM_USERNAME}?t=${timestamp}`;
+        const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(rssUrl)}`;
         
-        const response = await fetch(apiUrl);
+        const response = await fetch(proxyUrl);
         if (!response.ok) throw new Error('Failed to fetch blogs');
         
-        const data = await response.json();
+        const xmlText = await response.text();
         
-        if (data.status === 'ok') {
-          // Medium posts sometimes don't have a thumbnail field explicitly in rss2json, 
-          // so we fallback to extracting the first img tag from the description
-          const parsedBlogs = data.items.map(item => {
-            let imageUrl = item.thumbnail;
+        if (xmlText) {
+          const parser = new DOMParser();
+          const xmlDoc = parser.parseFromString(xmlText, "text/xml");
+          const items = Array.from(xmlDoc.querySelectorAll("item"));
+          
+          const parsedBlogs = items.map(item => {
+            const title = item.querySelector("title")?.textContent || "Untitled";
+            const link = item.querySelector("link")?.textContent || "#";
             
-            if (!imageUrl) {
-              const imgMatch = item.description.match(/<img[^>]+src="([^">]+)"/);
-              if (imgMatch) imageUrl = imgMatch[1];
-            }
+            const pubDateText = item.querySelector("pubDate")?.textContent;
+            const pubDate = pubDateText ? new Date(pubDateText).toLocaleDateString('en-US', {
+              year: 'numeric', month: 'short', day: 'numeric'
+            }) : "";
 
-            // Extract a clean text snippet from the HTML description
-            const textSnippet = item.description
+            // Medium puts full HTML content in <content:encoded>
+            const contentNode = item.getElementsByTagNameNS("*", "encoded")[0];
+            const contentHtml = contentNode ? contentNode.textContent : (item.querySelector("description")?.textContent || "");
+
+            // Extract the first image from the HTML
+            const imgMatch = contentHtml.match(/<img[^>]+src="([^">]+)"/);
+            const imageUrl = imgMatch ? imgMatch[1] : null;
+
+            // Extract a clean text snippet
+            const textSnippet = contentHtml
               .replace(/<[^>]+>/g, '') // Strip HTML tags
               .replace(/Continue reading on Medium.*/i, '') // Remove medium footer text
               .substring(0, 150) + '...';
 
+            // Extract categories
+            const categoryNodes = item.querySelectorAll("category");
+            const categories = Array.from(categoryNodes).map(node => node.textContent);
+
             return {
-              title: item.title,
-              link: item.link,
-              pubDate: new Date(item.pubDate).toLocaleDateString('en-US', {
-                year: 'numeric', month: 'short', day: 'numeric'
-              }),
+              title,
+              link,
+              pubDate,
               thumbnail: imageUrl,
               description: textSnippet,
-              categories: item.categories || []
+              categories
             };
           });
           
