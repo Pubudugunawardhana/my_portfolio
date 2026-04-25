@@ -45,11 +45,13 @@ export function About() {
           <div className="relative group">
             <div className="absolute -inset-1 bg-gradient-to-r from-primary-600 to-purple-600 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
             <div className="relative aspect-square md:aspect-[4/5] bg-white dark:bg-gray-900 rounded-2xl overflow-hidden shadow-2xl">
-              <img
-                src="https://images.unsplash.com/photo-1549692520-acc6669e2f0c?q=80&w=1000&auto=format&fit=crop"
-                alt={personalInfo.name}
-                className="w-full h-full object-cover filter grayscale hover:grayscale-0 transition-all duration-500"
-              />
+              <a href={personalInfo.linkedin || "#"} target="_blank" rel="noopener noreferrer" className="block w-full h-full cursor-pointer">
+                <img
+                  src={personalInfo.profileImage || "https://images.unsplash.com/photo-1549692520-acc6669e2f0c?q=80&w=1000&auto=format&fit=crop"}
+                  alt={personalInfo.name || "Profile"}
+                  className="w-full h-full object-cover filter grayscale hover:grayscale-0 hover:scale-105 transition-all duration-500"
+                />
+              </a>
             </div>
           </div>
         </motion.div>
