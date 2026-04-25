@@ -1,40 +1,65 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { motion } from 'framer-motion';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../../firebase';
 
-// Mock Data Generators for realistic looking charts
-const generateMockData = (type) => {
+// Real Data Processor
+const generateRealData = (type, dailyViewsMap) => {
+  if (!dailyViewsMap) return [];
+  
   const data = [];
   const now = new Date();
-  
+
   if (type === 'weekly') {
-    // Generate data for the past 7 days
     const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     for (let i = 6; i >= 0; i--) {
       const d = new Date();
       d.setDate(now.getDate() - i);
+      const dateString = d.toISOString().split('T')[0];
       data.push({
         name: days[d.getDay()],
-        views: Math.floor(Math.random() * 50) + 10,
+        views: dailyViewsMap[dateString] || 0,
       });
     }
   } else if (type === 'monthly') {
-    // Generate data for the past 4 weeks
+    // Sum views for the past 4 weeks (7 day chunks)
     for (let i = 4; i >= 1; i--) {
+      let weekViews = 0;
+      for (let j = 0; j < 7; j++) {
+        const d = new Date();
+        d.setDate(now.getDate() - ((i - 1) * 7 + j));
+        const dateString = d.toISOString().split('T')[0];
+        weekViews += dailyViewsMap[dateString] || 0;
+      }
       data.push({
         name: `Week ${5 - i}`,
-        views: Math.floor(Math.random() * 200) + 50,
+        views: weekViews,
       });
     }
   } else if (type === 'yearly') {
-    // Generate data for the past 6 months
+    // Sum views for the past 6 months
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     for (let i = 5; i >= 0; i--) {
       let m = now.getMonth() - i;
-      if (m < 0) m += 12;
+      let y = now.getFullYear();
+      if (m < 0) {
+        m += 12;
+        y -= 1;
+      }
+      
+      let monthViews = 0;
+      const prefix = `${y}-${String(m + 1).padStart(2, '0')}`;
+      
+      Object.keys(dailyViewsMap).forEach(dateStr => {
+        if (dateStr.startsWith(prefix)) {
+          monthViews += dailyViewsMap[dateStr];
+        }
+      });
+
       data.push({
         name: months[m],
-        views: Math.floor(Math.random() * 800) + 200,
+        views: monthViews,
       });
     }
   }
@@ -42,7 +67,6 @@ const generateMockData = (type) => {
   return data;
 };
 
-// Custom Tooltip for the chart
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
     return (
@@ -59,11 +83,36 @@ const CustomTooltip = ({ active, payload, label }) => {
 
 export function AnalyticsChart() {
   const [timeRange, setTimeRange] = useState('weekly');
-  const [chartData, setChartData] = useState(generateMockData('weekly'));
+  const [dailyViewsMap, setDailyViewsMap] = useState({});
+  const [chartData, setChartData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Fetch Real Analytics Data from Firebase
+  useEffect(() => {
+    const fetchAnalytics = async () => {
+      try {
+        const docSnap = await getDoc(doc(db, 'analytics', 'visitors'));
+        if (docSnap.exists() && docSnap.data().dailyViews) {
+          const fetchedMap = docSnap.data().dailyViews;
+          setDailyViewsMap(fetchedMap);
+          setChartData(generateRealData(timeRange, fetchedMap));
+        } else {
+          // If no dailyViews exist yet, initialize an empty map so it shows 0s
+          setChartData(generateRealData(timeRange, {}));
+        }
+      } catch (error) {
+        console.error("Failed to load analytics chart data", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchAnalytics();
+  }, []);
 
   const handleTabChange = (range) => {
     setTimeRange(range);
-    setChartData(generateMockData(range));
+    setChartData(generateRealData(range, dailyViewsMap));
   };
 
   return (
@@ -73,7 +122,7 @@ export function AnalyticsChart() {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
         <div>
           <h3 className="text-xl font-extrabold text-slate-900 dark:text-white">Visitor Analytics</h3>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Traffic overview over time (Simulated)</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Real-time traffic overview</p>
         </div>
         
         <div className="flex p-1 bg-slate-100 dark:bg-slate-900 rounded-xl">
@@ -101,43 +150,49 @@ export function AnalyticsChart() {
       </div>
 
       {/* Chart Container */}
-      <div className="w-full h-72 sm:h-96">
-        <ResponsiveContainer width="100%" height="100%">
-          <AreaChart
-            data={chartData}
-            margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
-          >
-            <defs>
-              <linearGradient id="colorViews" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.4}/>
-                <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
-              </linearGradient>
-            </defs>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#334155" opacity={0.2} />
-            <XAxis 
-              dataKey="name" 
-              axisLine={false} 
-              tickLine={false} 
-              tick={{ fill: '#64748b', fontSize: 12 }}
-              dy={10}
-            />
-            <YAxis 
-              axisLine={false} 
-              tickLine={false} 
-              tick={{ fill: '#64748b', fontSize: 12 }}
-            />
-            <Tooltip content={<CustomTooltip />} />
-            <Area 
-              type="monotone" 
-              dataKey="views" 
-              stroke="#3b82f6" 
-              strokeWidth={3}
-              fillOpacity={1} 
-              fill="url(#colorViews)" 
-              animationDuration={1500}
-            />
-          </AreaChart>
-        </ResponsiveContainer>
+      <div className="w-full h-72 sm:h-96 relative">
+        {isLoading ? (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+          </div>
+        ) : (
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart
+              data={chartData}
+              margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+            >
+              <defs>
+                <linearGradient id="colorViews" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.4}/>
+                  <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#334155" opacity={0.2} />
+              <XAxis 
+                dataKey="name" 
+                axisLine={false} 
+                tickLine={false} 
+                tick={{ fill: '#64748b', fontSize: 12 }}
+                dy={10}
+              />
+              <YAxis 
+                axisLine={false} 
+                tickLine={false} 
+                tick={{ fill: '#64748b', fontSize: 12 }}
+              />
+              <Tooltip content={<CustomTooltip />} />
+              <Area 
+                type="monotone" 
+                dataKey="views" 
+                stroke="#3b82f6" 
+                strokeWidth={3}
+                fillOpacity={1} 
+                fill="url(#colorViews)" 
+                animationDuration={1500}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        )}
       </div>
 
     </div>
