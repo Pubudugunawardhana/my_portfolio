@@ -8,6 +8,7 @@ import { ManageAbout } from './ManageAbout';
 import { ManageMessages } from './ManageMessages';
 import { ManageProfile } from './ManageProfile';
 import { ManageCertifications } from './ManageCertifications';
+import { AnalyticsChart } from './AnalyticsChart';
 import { getDashboardOverviewStats } from '../../services/analyticsService';
 
 export function AdminDashboard() {
@@ -60,7 +61,10 @@ export function AdminDashboard() {
             {/* Nested Content Based on Sidebar Selection */}
             <Routes>
               <Route path="/" element={
-                 <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
+                 <div className="space-y-8">
+                   <AnalyticsChart />
+                   
+                   <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
                    <div className="px-8 py-6 border-b border-slate-100 dark:border-slate-700">
                      <h3 className="text-xl font-bold text-slate-800 dark:text-white">Quick Actions</h3>
                    </div>
@@ -107,6 +111,7 @@ export function AdminDashboard() {
                      </Link>
 
                    </div>
+                 </div>
                  </div>
               } />
               <Route path="/projects" element={<ManageProjects />} />

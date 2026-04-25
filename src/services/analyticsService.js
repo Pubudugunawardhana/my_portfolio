@@ -7,10 +7,18 @@ const ANALYTICS_DOC_REF = doc(db, 'analytics', 'visitors');
 export async function incrementPageViews() {
   try {
     const docSnap = await getDoc(ANALYTICS_DOC_REF);
+    const today = new Date().toISOString().split('T')[0]; // Gets format 'YYYY-MM-DD'
+    
     if (!docSnap.exists()) {
-      await setDoc(ANALYTICS_DOC_REF, { totalViews: 1 });
+      await setDoc(ANALYTICS_DOC_REF, { 
+        totalViews: 1,
+        dailyViews: { [today]: 1 }
+      });
     } else {
-      await updateDoc(ANALYTICS_DOC_REF, { totalViews: increment(1) });
+      await updateDoc(ANALYTICS_DOC_REF, { 
+        totalViews: increment(1),
+        [`dailyViews.${today}`]: increment(1)
+      });
     }
   } catch (error) {
     console.error("View increment failed", error);
