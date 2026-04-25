@@ -77,19 +77,22 @@ export function Skills() {
             <motion.div
               key={skillSet.name}
               variants={itemVariants}
-              className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow group"
+              className="relative group h-full"
             >
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-                {skillSet.name}
-              </h3>
-              <ul className="space-y-3">
-                {skillSet.tech.map((tech) => (
-                  <li key={tech} className="flex items-center text-gray-600 dark:text-gray-300">
-                    {getTechIcon(tech)}
-                    {tech}
-                  </li>
-                ))}
-              </ul>
+              <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-3xl blur opacity-0 group-hover:opacity-50 transition duration-500 group-hover:duration-200"></div>
+              <div className="relative h-full bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700">
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+                  {skillSet.name}
+                </h3>
+                <ul className="space-y-3">
+                  {skillSet.tech.map((tech) => (
+                    <li key={tech} className="flex items-center text-gray-600 dark:text-gray-300">
+                      {getTechIcon(tech)}
+                      {tech}
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </motion.div>
           );
         })}
