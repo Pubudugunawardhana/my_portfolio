@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Link } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
+import { FolderOpen, Award, User, MessageSquare } from 'lucide-react';
 import { ManageProjects } from './ManageProjects';
 import { ManageSkills } from './ManageSkills';
 import { ManageAbout } from './ManageAbout';
@@ -63,8 +64,48 @@ export function AdminDashboard() {
                    <div className="px-8 py-6 border-b border-slate-100 dark:border-slate-700">
                      <h3 className="text-xl font-bold text-slate-800 dark:text-white">Quick Actions</h3>
                    </div>
-                   <div className="p-8 text-center text-slate-500 dark:text-slate-400">
-                     <p>Select an option from the sidebar to start managing your dynamic content.</p>
+                   <div className="p-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                     
+                     <Link to="/admin/projects" className="flex items-center gap-4 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 hover:border-blue-500 dark:hover:border-blue-500 bg-slate-50 hover:bg-white dark:bg-slate-900/50 dark:hover:bg-slate-800 transition-all group">
+                       <div className="p-3 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-xl group-hover:scale-110 transition-transform">
+                         <FolderOpen size={24} />
+                       </div>
+                       <div className="text-left">
+                         <h4 className="font-bold text-slate-800 dark:text-white">New Project</h4>
+                         <p className="text-sm text-slate-500">Upload to gallery</p>
+                       </div>
+                     </Link>
+
+                     <Link to="/admin/certifications" className="flex items-center gap-4 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 hover:border-purple-500 dark:hover:border-purple-500 bg-slate-50 hover:bg-white dark:bg-slate-900/50 dark:hover:bg-slate-800 transition-all group">
+                       <div className="p-3 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 rounded-xl group-hover:scale-110 transition-transform">
+                         <Award size={24} />
+                       </div>
+                       <div className="text-left">
+                         <h4 className="font-bold text-slate-800 dark:text-white">Add Certificate</h4>
+                         <p className="text-sm text-slate-500">Showcase credentials</p>
+                       </div>
+                     </Link>
+
+                     <Link to="/admin/profile" className="flex items-center gap-4 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 hover:border-amber-500 dark:hover:border-amber-500 bg-slate-50 hover:bg-white dark:bg-slate-900/50 dark:hover:bg-slate-800 transition-all group">
+                       <div className="p-3 bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 rounded-xl group-hover:scale-110 transition-transform">
+                         <User size={24} />
+                       </div>
+                       <div className="text-left">
+                         <h4 className="font-bold text-slate-800 dark:text-white">Edit Profile</h4>
+                         <p className="text-sm text-slate-500">Update Hero details</p>
+                       </div>
+                     </Link>
+
+                     <Link to="/admin/messages" className="flex items-center gap-4 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 hover:border-emerald-500 dark:hover:border-emerald-500 bg-slate-50 hover:bg-white dark:bg-slate-900/50 dark:hover:bg-slate-800 transition-all group">
+                       <div className="p-3 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-xl group-hover:scale-110 transition-transform">
+                         <MessageSquare size={24} />
+                       </div>
+                       <div className="text-left">
+                         <h4 className="font-bold text-slate-800 dark:text-white">Inbox</h4>
+                         <p className="text-sm text-slate-500">Check new messages</p>
+                       </div>
+                     </Link>
+
                    </div>
                  </div>
               } />
