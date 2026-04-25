@@ -42,15 +42,44 @@ export function About() {
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          <div className="relative group">
-            <div className="absolute -inset-1 bg-gradient-to-r from-primary-600 to-purple-600 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
-            <div className="relative aspect-square md:aspect-[4/5] bg-white dark:bg-gray-900 rounded-2xl overflow-hidden shadow-2xl">
-              <a href={personalInfo.linkedin || "#"} target="_blank" rel="noopener noreferrer" className="block w-full h-full cursor-pointer">
+          <div className="relative bg-white dark:bg-slate-900 rounded-3xl shadow-xl overflow-hidden border border-slate-100 dark:border-slate-800 flex flex-col items-center">
+            {/* Gradient Banner */}
+            <div className="w-full h-32 bg-gradient-to-r from-blue-300 via-indigo-400 to-purple-400 dark:from-blue-600 dark:via-indigo-700 dark:to-purple-800"></div>
+            
+            <div className="px-6 pb-8 flex flex-col items-center w-full relative">
+              {/* Profile Avatar overlapping the banner, centered */}
+              <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-40 h-40 rounded-full border-4 border-white dark:border-slate-900 overflow-hidden bg-slate-200 shadow-lg">
                 <img
                   src={personalInfo.profileImage || "https://images.unsplash.com/photo-1549692520-acc6669e2f0c?q=80&w=1000&auto=format&fit=crop"}
                   alt={personalInfo.name || "Profile"}
-                  className="w-full h-full object-cover filter grayscale hover:grayscale-0 hover:scale-105 transition-all duration-500"
+                  className="w-full h-full object-cover"
                 />
+              </div>
+
+              {/* Push content down to make room for avatar */}
+              <div className="mt-24 flex flex-col items-center text-center">
+                <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
+                  {personalInfo.name || "Loading..."}
+                </h2>
+                <p className="text-slate-500 dark:text-slate-400 font-medium">
+                  {personalInfo.role || "Professional"}
+                </p>
+                
+                <div className="flex items-center justify-center gap-2 mt-2 mb-6 text-slate-600 dark:text-slate-400">
+                  <MapPin size={16} className="text-blue-500" />
+                  <span className="text-sm font-medium">{personalInfo.location || "Not Specified"}</span>
+                </div>
+              </div>
+
+              {/* Full Width Connect Button */}
+              <a 
+                href={personalInfo.linkedin || "#"} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="w-full py-3 rounded-full border-2 border-blue-600 text-blue-600 dark:text-blue-400 dark:border-blue-500 font-bold hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors flex items-center justify-center gap-2"
+              >
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+                Connect
               </a>
             </div>
           </div>
@@ -70,14 +99,13 @@ export function About() {
             {personalInfo.longBio}
           </p>
           
-          <div className="grid grid-cols-2 gap-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-            <div>
-              <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Location</h4>
-              <p className="text-gray-600 dark:text-gray-300">{personalInfo.location || 'Not Specified'}</p>
-            </div>
+          <div className="grid grid-cols-1 pt-6 border-t border-gray-200 dark:border-gray-700">
             <div>
               <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Availability</h4>
-              <p className="text-green-600 dark:text-green-400">Open to opportunities</p>
+              <p className="text-green-600 dark:text-green-400 font-medium flex items-center gap-2">
+                 <span className="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse"></span>
+                 Open to opportunities
+              </p>
             </div>
           </div>
 
