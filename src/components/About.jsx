@@ -42,7 +42,11 @@ export function About() {
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          <div className="relative bg-white dark:bg-slate-900 rounded-3xl shadow-xl overflow-hidden border border-slate-100 dark:border-slate-800 flex flex-col items-center">
+          <div className="relative group">
+            {/* Glowing background effect */}
+            <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl blur opacity-25 group-hover:opacity-60 transition duration-1000 group-hover:duration-200"></div>
+            
+            <div className="relative bg-white dark:bg-slate-900 rounded-3xl shadow-xl overflow-hidden border border-slate-100 dark:border-slate-800 flex flex-col items-center">
             {/* Gradient Banner */}
             <div className="w-full h-32 bg-gradient-to-r from-blue-300 via-indigo-400 to-purple-400 dark:from-blue-600 dark:via-indigo-700 dark:to-purple-800"></div>
             
@@ -83,6 +87,7 @@ export function About() {
               </a>
             </div>
           </div>
+        </div>
         </motion.div>
 
         <motion.div
