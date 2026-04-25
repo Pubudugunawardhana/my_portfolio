@@ -85,6 +85,40 @@ export function About() {
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
                 Connect
               </a>
+
+              {/* Education Section inside Profile Card */}
+              {(personalInfo.university || personalInfo.school) && (
+              <div className="w-full mt-8 pt-6 border-t border-slate-200 dark:border-slate-700 text-left">
+                 <h4 className="font-semibold text-slate-900 dark:text-white mb-5 flex items-center gap-2">
+                    <GraduationCap className="w-5 h-5 text-blue-500" />
+                    Educational Background
+                 </h4>
+                 <div className="space-y-5">
+                   {personalInfo.university && (
+                     <div className="flex gap-3 items-start">
+                        <div className="w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center shrink-0 border border-blue-100 dark:border-blue-800">
+                           <GraduationCap className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                        </div>
+                        <div className="pt-0.5">
+                          <h5 className="font-bold text-slate-900 dark:text-white text-sm">University</h5>
+                          <p className="text-slate-600 dark:text-slate-400 text-sm leading-snug">{personalInfo.university}</p>
+                        </div>
+                     </div>
+                   )}
+                   {personalInfo.school && (
+                     <div className="flex gap-3 items-start">
+                        <div className="w-10 h-10 rounded-full bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center shrink-0 border border-indigo-100 dark:border-indigo-800">
+                           <BookOpen className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                        </div>
+                        <div className="pt-0.5">
+                          <h5 className="font-bold text-slate-900 dark:text-white text-sm">High School</h5>
+                          <p className="text-slate-600 dark:text-slate-400 text-sm leading-snug">{personalInfo.school}</p>
+                        </div>
+                     </div>
+                   )}
+                 </div>
+              </div>
+              )}
             </div>
           </div>
         </div>
@@ -114,39 +148,6 @@ export function About() {
             </div>
           </div>
 
-          {/* Education Section */}
-          {(personalInfo.university || personalInfo.school) && (
-          <div className="pt-6 border-t border-gray-200 dark:border-gray-700">
-             <h4 className="font-semibold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
-                <GraduationCap className="w-5 h-5 text-primary-500" />
-                Educational Background
-             </h4>
-             <div className="space-y-5">
-               {personalInfo.university && (
-                 <div className="flex gap-4 items-start">
-                    <div className="w-12 h-12 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center shrink-0 border border-primary-200 dark:border-primary-800">
-                       <GraduationCap className="w-6 h-6 text-primary-600 dark:text-primary-400" />
-                    </div>
-                    <div className="pt-1">
-                      <h5 className="font-bold text-gray-900 dark:text-white text-lg">University</h5>
-                      <p className="text-gray-600 dark:text-gray-300">{personalInfo.university}</p>
-                    </div>
-                 </div>
-               )}
-               {personalInfo.school && (
-                 <div className="flex gap-4 items-start">
-                    <div className="w-12 h-12 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center shrink-0 border border-indigo-200 dark:border-indigo-800">
-                       <BookOpen className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-                    </div>
-                    <div className="pt-1">
-                      <h5 className="font-bold text-gray-900 dark:text-white text-lg">High School</h5>
-                      <p className="text-gray-600 dark:text-gray-300">{personalInfo.school}</p>
-                    </div>
-                 </div>
-               )}
-             </div>
-          </div>
-          )}
         </motion.div>
       </div>
       
