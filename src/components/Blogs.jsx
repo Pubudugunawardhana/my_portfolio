@@ -25,7 +25,9 @@ export function Blogs() {
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
-        const rssUrl = `https://medium.com/feed/${MEDIUM_USERNAME}`;
+        // Append a unique timestamp to bypass heavy caching by rss2json and Medium
+        const timestamp = new Date().getTime();
+        const rssUrl = `https://medium.com/feed/${MEDIUM_USERNAME}?t=${timestamp}`;
         const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`;
         
         const response = await fetch(apiUrl);
@@ -50,10 +52,17 @@ export function Blogs() {
               .replace(/Continue reading on Medium.*/i, '') // Remove medium footer text
               .substring(0, 150) + '...';
 
-            // Format date nicely
-            const pubDate = new Date(item.pubDate.replace(' ', 'T')).toLocaleDateString('en-US', {
-              year: 'numeric', month: 'short', day: 'numeric'
-            });
+            // Format date nicely with a fallback
+            let pubDate = "Recently";
+            if (item.pubDate) {
+               try {
+                  pubDate = new Date(item.pubDate.replace(' ', 'T')).toLocaleDateString('en-US', {
+                    year: 'numeric', month: 'short', day: 'numeric'
+                  });
+               } catch (e) {
+                  pubDate = item.pubDate;
+               }
+            }
 
             return {
               title: item.title,
@@ -80,10 +89,6 @@ export function Blogs() {
     fetchBlogs();
   }, []);
 
-  if (!isLoading && blogs.length === 0) {
-    return null;
-  }
-
   return (
     <Section id="blogs" title="Articles & Blogs" className="bg-slate-50 dark:bg-slate-950">
       {isLoading ? (
@@ -92,8 +97,14 @@ export function Blogs() {
            <p className="mt-4 text-slate-500 dark:text-slate-400 font-medium tracking-wide animate-pulse">Fetching latest articles...</p>
         </div>
       ) : error ? (
-        <div className="text-center py-10 text-red-500">
-          <p>Failed to load blogs. Please check back later.</p>
+        <div className="text-center py-10">
+          <p className="text-red-500 font-bold mb-2">Failed to load blogs.</p>
+          <p className="text-sm text-slate-500 bg-slate-100 dark:bg-slate-800 p-4 rounded-lg inline-block font-mono">Error: {error}</p>
+        </div>
+      ) : blogs.length === 0 ? (
+        <div className="text-center py-16">
+          <BookOpen className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-4" />
+          <p className="text-slate-500 dark:text-slate-400 font-medium">No articles found yet. Check back soon!</p>
         </div>
       ) : (
         <div className="relative group/slider">
