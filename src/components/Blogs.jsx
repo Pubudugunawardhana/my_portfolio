@@ -25,59 +25,49 @@ export function Blogs() {
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
-        // We use allorigins with disableCache and a timestamp to completely bypass all caches!
-        const timestamp = new Date().getTime();
-        const rssUrl = `https://medium.com/feed/${MEDIUM_USERNAME}?t=${timestamp}`;
-        const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(rssUrl)}`;
+        const rssUrl = `https://medium.com/feed/${MEDIUM_USERNAME}`;
+        const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`;
         
-        const response = await fetch(proxyUrl);
+        const response = await fetch(apiUrl);
         if (!response.ok) throw new Error('Failed to fetch blogs');
         
-        const xmlText = await response.text();
+        const data = await response.json();
         
-        if (xmlText) {
-          const parser = new DOMParser();
-          const xmlDoc = parser.parseFromString(xmlText, "text/xml");
-          const items = Array.from(xmlDoc.querySelectorAll("item"));
-          
-          const parsedBlogs = items.map(item => {
-            const title = item.querySelector("title")?.textContent || "Untitled";
-            const link = item.querySelector("link")?.textContent || "#";
+        if (data.status === 'ok') {
+          const parsedBlogs = data.items.map(item => {
             
-            const pubDateText = item.querySelector("pubDate")?.textContent;
-            const pubDate = pubDateText ? new Date(pubDateText).toLocaleDateString('en-US', {
-              year: 'numeric', month: 'short', day: 'numeric'
-            }) : "";
-
-            // Medium puts full HTML content in <content:encoded>
-            const contentNode = item.getElementsByTagNameNS("*", "encoded")[0];
-            const contentHtml = contentNode ? contentNode.textContent : (item.querySelector("description")?.textContent || "");
-
-            // Extract the first image from the HTML
-            const imgMatch = contentHtml.match(/<img[^>]+src="([^">]+)"/);
-            const imageUrl = imgMatch ? imgMatch[1] : null;
+            // Extract the first image from the content if thumbnail is empty
+            let imageUrl = item.thumbnail;
+            if (!imageUrl && item.content) {
+              const imgMatch = item.content.match(/<img[^>]+src="([^">]+)"/);
+              imageUrl = imgMatch ? imgMatch[1] : null;
+            }
 
             // Extract a clean text snippet
-            const textSnippet = contentHtml
+            const textContent = item.description || item.content || "";
+            const textSnippet = textContent
               .replace(/<[^>]+>/g, '') // Strip HTML tags
               .replace(/Continue reading on Medium.*/i, '') // Remove medium footer text
               .substring(0, 150) + '...';
 
-            // Extract categories
-            const categoryNodes = item.querySelectorAll("category");
-            const categories = Array.from(categoryNodes).map(node => node.textContent);
+            // Format date nicely
+            const pubDate = new Date(item.pubDate.replace(' ', 'T')).toLocaleDateString('en-US', {
+              year: 'numeric', month: 'short', day: 'numeric'
+            });
 
             return {
-              title,
-              link,
-              pubDate,
+              title: item.title,
+              link: item.link,
+              pubDate: pubDate,
               thumbnail: imageUrl,
               description: textSnippet,
-              categories
+              categories: item.categories || []
             };
           });
           
           setBlogs(parsedBlogs);
+        } else {
+           throw new Error(data.message || 'Failed to parse RSS feed');
         }
       } catch (err) {
         console.error("Error fetching Medium blogs:", err);
