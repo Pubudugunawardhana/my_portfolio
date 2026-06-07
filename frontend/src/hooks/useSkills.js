@@ -23,7 +23,14 @@ export function useSkills() {
   useEffect(() => {
     fetchSkills();
     window.addEventListener('focus', fetchSkills);
-    return () => window.removeEventListener('focus', fetchSkills);
+    
+    // Polling interval for true real-time effect
+    const interval = setInterval(fetchSkills, 5000);
+    
+    return () => {
+      window.removeEventListener('focus', fetchSkills);
+      clearInterval(interval);
+    };
   }, [fetchSkills]);
 
   const addSkillCategory = async (categoryObj) => {
