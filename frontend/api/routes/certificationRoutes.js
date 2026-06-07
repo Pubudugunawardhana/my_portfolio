@@ -21,6 +21,15 @@ router.post('/', protect, async (req, res) => {
   }
 });
 
+router.put('/:id', protect, async (req, res) => {
+  try {
+    const cert = await Certification.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    res.json(cert);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
 router.delete('/:id', protect, async (req, res) => {
   try {
     await Certification.findByIdAndDelete(req.params.id);

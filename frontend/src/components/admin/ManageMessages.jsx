@@ -19,6 +19,8 @@ export function ManageMessages() {
     };
     
     fetchMessages();
+    window.addEventListener('focus', fetchMessages);
+    return () => window.removeEventListener('focus', fetchMessages);
   }, []);
 
   const handleDelete = async (id) => {

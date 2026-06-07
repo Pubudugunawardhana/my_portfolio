@@ -11,7 +11,7 @@ export function ManageSkills() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     // Convert comma separated string to array
@@ -27,14 +27,18 @@ export function ManageSkills() {
         tech: techArray 
     };
 
-    if (editingName) {
-      updateSkillCategory(editingName, compiledCategory);
-    } else {
-      addSkillCategory(compiledCategory);
+    try {
+      if (editingName) {
+        await updateSkillCategory(editingName, compiledCategory);
+      } else {
+        await addSkillCategory(compiledCategory);
+      }
+      setFormData({ name: '', tech: '' });
+      setEditingName(null);
+    } catch (error) {
+      console.error(error);
+      alert("An error occurred while saving the skill: " + error.message);
     }
-
-    setFormData({ name: '', tech: '' });
-    setEditingName(null);
   };
 
   const handleEditClick = (skill) => {

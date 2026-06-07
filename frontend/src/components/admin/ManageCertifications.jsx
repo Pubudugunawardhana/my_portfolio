@@ -5,7 +5,7 @@ import { UploadCloud, Award } from 'lucide-react';
 export function ManageCertifications() {
   const { certifications, isLoading, addCertification, editCertification, deleteCertification } = useCertifications();
   
-  const [formData, setFormData] = useState({ title: '', issuer: '', date: '', credentialUrl: '', image: '' });
+  const [formData, setFormData] = useState({ title: '', issuer: '', date: '', credentialUrl: '', image: '', description: '' });
   const [editingId, setEditingId] = useState(null);
   const [isCompressing, setIsCompressing] = useState(false);
   const fileInputRef = useRef(null);
@@ -62,17 +62,21 @@ export function ManageCertifications() {
     reader.readAsDataURL(file);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (editingId) {
-      editCertification(editingId, formData);
-    } else {
-      addCertification(formData);
+    
+    try {
+      if (editingId) {
+        await editCertification(editingId, formData);
+      } else {
+        await addCertification(formData);
+      }
+      setFormData({ title: '', issuer: '', date: '', credentialUrl: '', image: '', description: '' });
+      setEditingId(null);
+    } catch (error) {
+      console.error(error);
+      alert("An error occurred while saving the certification: " + error.message);
     }
-
-    setFormData({ title: '', issuer: '', date: '', credentialUrl: '', image: '' });
-    setEditingId(null);
   };
 
   const handleEditClick = (cert) => {
@@ -82,14 +86,15 @@ export function ManageCertifications() {
       issuer: cert.issuer,
       date: cert.date,
       credentialUrl: cert.credentialUrl,
-      image: cert.image
+      image: cert.image,
+      description: cert.description || ''
     });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleCancelEdit = () => {
     setEditingId(null);
-    setFormData({ title: '', issuer: '', date: '', credentialUrl: '', image: '' });
+    setFormData({ title: '', issuer: '', date: '', credentialUrl: '', image: '', description: '' });
   };
 
   const handleDeleteClick = (id, title) => {
@@ -163,6 +168,18 @@ export function ManageCertifications() {
                 onChange={handleChange} 
                 className="w-full px-4 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-slate-800 dark:text-slate-100" 
                 placeholder="Link to verify badge..."
+              />
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Description</label>
+              <textarea 
+                name="description" 
+                value={formData.description} 
+                onChange={handleChange} 
+                rows="3"
+                className="w-full px-4 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-slate-800 dark:text-slate-100 resize-none" 
+                placeholder="Briefly describe what you learned or achieved..."
               />
             </div>
 
@@ -251,7 +268,10 @@ export function ManageCertifications() {
             <div className="flex-1 w-full text-left">
               <h4 className="text-lg font-bold text-slate-800 dark:text-white">{cert.title}</h4>
               <p className="text-sm font-medium text-blue-500 dark:text-blue-400 mt-1">{cert.issuer}</p>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Earned: {cert.date}</p>
+              {cert.description && (
+                <p className="text-sm text-slate-600 dark:text-slate-300 mt-2 line-clamp-2">{cert.description}</p>
+              )}
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">Earned: {cert.date}</p>
             </div>
 
             <div className="flex w-full md:w-auto gap-3 shrink-0">

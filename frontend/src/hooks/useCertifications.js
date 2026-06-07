@@ -1,34 +1,45 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { 
-  listenToCertificationsFromFirebase, 
   addCertificationToFirebase, 
   updateCertificationInFirebase, 
-  deleteCertificationFromFirebase 
+  deleteCertificationFromFirebase,
+  getCertificationsFromFirebase
 } from '../services/certificationService';
 
 export function useCertifications() {
   const [certifications, setCertifications] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    const unsubscribe = listenToCertificationsFromFirebase((liveData) => {
-      setCertifications(liveData);
+  const fetchCertifications = useCallback(async () => {
+    try {
+      const data = await getCertificationsFromFirebase();
+      setCertifications(data);
+    } catch (err) {
+      console.error(err);
+    } finally {
       setIsLoading(false);
-    });
-
-    return () => unsubscribe();
+    }
   }, []);
+
+  useEffect(() => {
+    fetchCertifications();
+    window.addEventListener('focus', fetchCertifications);
+    return () => window.removeEventListener('focus', fetchCertifications);
+  }, [fetchCertifications]);
 
   const addCertification = async (data) => {
     await addCertificationToFirebase(data);
+    fetchCertifications();
   };
 
   const editCertification = async (id, updatedData) => {
     await updateCertificationInFirebase(id, updatedData);
+    fetchCertifications();
   };
 
   const deleteCertification = async (id) => {
     await deleteCertificationFromFirebase(id);
+    fetchCertifications();
   };
 
   return { 

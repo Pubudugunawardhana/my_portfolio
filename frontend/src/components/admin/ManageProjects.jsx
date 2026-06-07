@@ -10,6 +10,7 @@ export function ManageProjects() {
   // If editingId is null, we are in "Add Mode". If it holds an ID, we are in "Edit Mode".
   const [editingId, setEditingId] = useState(null);
   const [isCompressing, setIsCompressing] = useState(false);
+  const [projectToDelete, setProjectToDelete] = useState(null);
   const fileInputRef = useRef(null);
 
   // Safely handles user typing into text fields
@@ -66,7 +67,7 @@ export function ManageProjects() {
     reader.readAsDataURL(file);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     // Quick sanitization to ensure 'tech' is saved as an Array if typed as a comma-separated list
@@ -82,27 +83,32 @@ export function ManageProjects() {
         tech: techArray 
     };
 
-    if (editingId) {
-      editProject(editingId, compiledProject);
-    } else {
-      addProject(compiledProject);
-    }
+    try {
+      if (editingId) {
+        await editProject(editingId, compiledProject);
+      } else {
+        await addProject(compiledProject);
+      }
 
-    // Reset the form
-    setFormData({ title: '', description: '', image: '', githubUrl: '', liveUrl: '', tech: '' });
-    setEditingId(null);
+      // Reset the form only on success
+      setFormData({ title: '', description: '', image: '', githubUrl: '', liveUrl: '', tech: '' });
+      setEditingId(null);
+    } catch (error) {
+      console.error(error);
+      alert("An error occurred while saving the project: " + error.message);
+    }
   };
 
   const handleEditClick = (project) => {
     setEditingId(project.id);
     // Load existing project data directly into the inputs
     setFormData({
-      title: project.title,
-      description: project.description,
-      image: project.image,
-      githubUrl: project.githubUrl,
-      liveUrl: project.liveUrl,
-      tech: Array.isArray(project.tech) ? project.tech.join(', ') : project.tech
+      title: project.title || '',
+      description: project.description || '',
+      image: project.image || '',
+      githubUrl: project.githubUrl || '',
+      liveUrl: project.liveUrl || '',
+      tech: Array.isArray(project.tech) ? project.tech.join(', ') : (project.tech || '')
     });
     // Scroll window smoothly to form
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -113,10 +119,19 @@ export function ManageProjects() {
     setFormData({ title: '', description: '', image: '', githubUrl: '', liveUrl: '', tech: '' });
   };
 
-  const handleDeleteClick = (projectId, projectTitle) => {
-    if (window.confirm(`Are you absolutely sure you want to delete the project "${projectTitle}"?\nThis cannot be undone.`)) {
-      deleteProject(projectId);
+  const handleDeleteClick = (project) => {
+    setProjectToDelete(project);
+  };
+
+  const confirmDelete = () => {
+    if (projectToDelete) {
+      deleteProject(projectToDelete.id);
+      setProjectToDelete(null);
     }
+  };
+
+  const cancelDelete = () => {
+    setProjectToDelete(null);
   };
 
   return (
@@ -263,7 +278,7 @@ export function ManageProjects() {
                 Edit
               </button>
               <button 
-                onClick={() => handleDeleteClick(project.id, project.title)} 
+                onClick={() => handleDeleteClick(project)} 
                 className="flex-1 md:flex-none px-4 py-2 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 font-medium rounded-lg hover:bg-red-100 dark:hover:bg-red-900/50 transition-colors"
               >
                 Delete
@@ -285,6 +300,39 @@ export function ManageProjects() {
           </div>
         )}
       </div>
+
+      {/* Custom Delete Confirmation Modal */}
+      {projectToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="p-6">
+              <div className="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mb-4">
+                <svg className="w-6 h-6 text-red-600 dark:text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-2">Delete Project?</h3>
+              <p className="text-slate-500 dark:text-slate-400">
+                Are you absolutely sure you want to delete the project <span className="font-semibold text-slate-700 dark:text-slate-300">"{projectToDelete.title}"</span>? This action cannot be undone.
+              </p>
+            </div>
+            <div className="bg-slate-50 dark:bg-slate-900/50 px-6 py-4 flex gap-3 justify-end border-t border-slate-100 dark:border-slate-700">
+              <button 
+                onClick={cancelDelete}
+                className="px-4 py-2 text-slate-600 dark:text-slate-400 font-medium hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg transition-colors"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={confirmDelete}
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors shadow-sm"
+              >
+                Yes, Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );
