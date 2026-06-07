@@ -19,13 +19,13 @@ import { getAuth } from "firebase/auth";
 // };
 
 const firebaseConfig = {
-  apiKey: "AIzaSyA1A3OLToXhOWQQdxxxVMVM5V8OrmPObXQ",
-  authDomain: "my-portfolio-89169.firebaseapp.com",
-  projectId: "my-portfolio-89169",
-  storageBucket: "my-portfolio-89169.firebasestorage.app",
-  messagingSenderId: "515991294284",
-  appId: "1:515991294284:web:fbc4b8d124415cf3e27fe9",
-  measurementId: "G-87YVCMCC0Q"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
 // Initialize Firebase with your secure config
