@@ -20,7 +20,14 @@ export function ManageMessages() {
     
     fetchMessages();
     window.addEventListener('focus', fetchMessages);
-    return () => window.removeEventListener('focus', fetchMessages);
+    
+    // Polling interval for true real-time effect
+    const interval = setInterval(fetchMessages, 5000);
+    
+    return () => {
+      window.removeEventListener('focus', fetchMessages);
+      clearInterval(interval);
+    };
   }, []);
 
   const handleDelete = async (id) => {

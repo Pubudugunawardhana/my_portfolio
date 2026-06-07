@@ -26,7 +26,14 @@ export function useProjects() {
     fetchProjects();
     // Simulate real-time by re-fetching when user switches tabs back
     window.addEventListener('focus', fetchProjects);
-    return () => window.removeEventListener('focus', fetchProjects);
+    
+    // Polling interval for true real-time effect
+    const interval = setInterval(fetchProjects, 5000);
+    
+    return () => {
+      window.removeEventListener('focus', fetchProjects);
+      clearInterval(interval);
+    };
   }, [fetchProjects]);
 
   const addProject = async (projectObj) => {
