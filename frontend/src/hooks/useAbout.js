@@ -19,7 +19,14 @@ export function useAbout() {
   useEffect(() => {
     fetchAbout();
     window.addEventListener('focus', fetchAbout);
-    return () => window.removeEventListener('focus', fetchAbout);
+    
+    // Polling interval for true real-time effect
+    const interval = setInterval(fetchAbout, 5000);
+    
+    return () => {
+      window.removeEventListener('focus', fetchAbout);
+      clearInterval(interval);
+    };
   }, [fetchAbout]);
 
   const updateAbout = async (newData) => {
