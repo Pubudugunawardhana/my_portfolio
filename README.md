@@ -139,16 +139,6 @@ Follow these steps to get a local copy up and running.
 
 ---
 
-## 📸 Screenshots
-
-*(Replace these placeholder links with actual screenshots of your portfolio once deployed!)*
-
-| Home Page | Admin Dashboard |
-| :---: | :---: |
-| <img src="https://via.placeholder.com/600x350.png?text=Hero+Section+Screenshot" alt="Home Screen" /> | <img src="https://via.placeholder.com/600x350.png?text=Admin+Dashboard+Screenshot" alt="Admin Screen" /> |
-
----
-
 ## 🤝 Contributing
 
 Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/Pubudugunawardhana/my_portfolio/issues).
