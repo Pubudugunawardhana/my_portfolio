@@ -24,7 +24,14 @@ export function useCertifications() {
   useEffect(() => {
     fetchCertifications();
     window.addEventListener('focus', fetchCertifications);
-    return () => window.removeEventListener('focus', fetchCertifications);
+    
+    // Polling interval for true real-time effect
+    const interval = setInterval(fetchCertifications, 5000);
+    
+    return () => {
+      window.removeEventListener('focus', fetchCertifications);
+      clearInterval(interval);
+    };
   }, [fetchCertifications]);
 
   const addCertification = async (data) => {
