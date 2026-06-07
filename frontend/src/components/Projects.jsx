@@ -76,13 +76,13 @@ export function Projects() {
               transition={{ duration: 0.5, delay: index * 0.1 }}
               className="w-full sm:w-[calc(50%-16px)] lg:w-[calc(33.333%-21.33px)] flex-shrink-0 snap-start group flex flex-col bg-white dark:bg-slate-800 rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl border border-slate-100 dark:border-slate-700 transition-all duration-300"
             >
-              {/* Image Container with Hover zoom effect */}
-            <div className="relative h-56 overflow-hidden">
-              <div className="absolute inset-0 bg-blue-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10" />
+            {/* Image Container with Hover zoom effect */}
+            <div className="relative h-56 bg-slate-50 dark:bg-slate-900 flex items-center justify-center p-4 overflow-hidden border-b border-slate-100 dark:border-slate-700">
+              <div className="absolute inset-0 bg-blue-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10" />
               <img
                 src={project.image}
                 alt={project.title}
-                className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500 ease-in-out"
+                className="w-full h-full object-contain transform group-hover:scale-105 transition-transform duration-500 ease-in-out shadow-sm rounded-md"
               />
             </div>
             
@@ -104,8 +104,8 @@ export function Projects() {
                   Read More
                 </button>
                 
-                {/* Tech Stack Pills */}
-                <div className="flex flex-wrap gap-2 min-h-[3.5rem] content-start">
+                {/* Tech Stack Pills - Fixed height to ensure alignment of Read More button */}
+                <div className="flex flex-wrap gap-2 h-[5.5rem] overflow-hidden content-start">
                   {Array.isArray(project.tech) && project.tech.map((techItem) => (
                     <span 
                       key={techItem} 

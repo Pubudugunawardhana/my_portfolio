@@ -24,7 +24,14 @@ export function AdminDashboard() {
     // Fire a parallel fetch on Admin mount
     fetchStats();
     window.addEventListener('focus', fetchStats);
-    return () => window.removeEventListener('focus', fetchStats);
+    
+    // Polling interval for true real-time effect
+    const interval = setInterval(fetchStats, 5000);
+    
+    return () => {
+      window.removeEventListener('focus', fetchStats);
+      clearInterval(interval);
+    };
   }, []);
   return (
     <div className="flex h-screen bg-slate-50 dark:bg-slate-950 font-sans mt-0 selection:bg-blue-500 selection:text-white">
