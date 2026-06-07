@@ -34,9 +34,15 @@ app.use('/api/messages', messageRoutes);
 app.use('/api/analytics', analyticsRoutes);
 
 app.get('/', (req, res) => {
-  res.send('Portfolio API is running...');
+  res.send('Portfolio API is running on Vercel Serverless...');
 });
 
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
-});
+// For local testing
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log(`🚀 Server running on http://localhost:${PORT}`);
+  });
+}
+
+// Export for Vercel Serverless
+module.exports = app;

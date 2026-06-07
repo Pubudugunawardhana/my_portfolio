@@ -1,6 +1,6 @@
 // src/services/certificationService.js
 
-const API_URL = 'http://localhost:5000/api/certifications';
+const API_URL = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL + '/certifications' : '/api/certifications';
 
 const getHeaders = () => {
   const token = localStorage.getItem('adminToken');
