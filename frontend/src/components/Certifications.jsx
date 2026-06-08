@@ -68,13 +68,13 @@ export function Certifications() {
                 className="w-full sm:w-[calc(50%-16px)] lg:w-[calc(33.333%-21.33px)] flex-shrink-0 snap-start group flex flex-col bg-slate-50 dark:bg-slate-800 rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl border border-slate-100 dark:border-slate-700 transition-all duration-300"
               >
               {/* Image Container */}
-              <div className="relative h-48 bg-white dark:bg-slate-900 flex items-center justify-center p-6 overflow-hidden border-b border-slate-100 dark:border-slate-700">
+              <div className="relative h-64 bg-white dark:bg-slate-900 flex items-center justify-center p-4 overflow-hidden border-b border-slate-100 dark:border-slate-700">
                 <div className="absolute inset-0 bg-purple-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10" />
                 {cert.image ? (
                   <img
                     src={cert.image}
                     alt={cert.title}
-                    className="w-full h-full object-contain transform group-hover:scale-110 transition-transform duration-500 ease-in-out"
+                    className="w-full h-full object-contain transform group-hover:scale-105 transition-transform duration-500 ease-in-out"
                   />
                 ) : (
                   <Award className="w-20 h-20 text-slate-300 dark:text-slate-700 transform group-hover:scale-110 group-hover:text-purple-400 transition-all duration-500 ease-in-out" />
@@ -91,22 +91,27 @@ export function Certifications() {
                   <p className="text-md font-semibold text-slate-600 dark:text-slate-300">
                     {cert.issuer}
                   </p>
-                  <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                  {cert.description && (
+                    <p className="text-sm text-slate-600 dark:text-slate-400 mt-3 line-clamp-3 leading-relaxed">
+                      {cert.description}
+                    </p>
+                  )}
+                  <p className="text-sm text-slate-500 dark:text-slate-400 mt-3">
                     Issued: {cert.date}
                   </p>
                 </div>
                 
                 {/* Card Footer Links */}
                 {cert.credentialUrl && (
-                  <div className="pt-6 mt-auto border-t border-slate-200 dark:border-slate-700">
+                  <div className="pt-4 mt-auto">
                     <a
                       href={cert.credentialUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 text-sm font-semibold text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300 transition-colors"
+                      className="flex items-center justify-center gap-2 w-full py-3 px-4 bg-purple-50 hover:bg-purple-100 dark:bg-slate-700 dark:hover:bg-slate-600 text-purple-700 dark:text-purple-300 font-semibold rounded-xl transition-all duration-300 group/btn"
                     >
                       <span>Verify Credential</span>
-                      <ExternalLink className="w-4 h-4" />
+                      <ExternalLink className="w-4 h-4 transform group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1 transition-transform" />
                     </a>
                   </div>
                 )}

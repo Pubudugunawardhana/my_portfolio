@@ -1,6 +1,6 @@
 // src/services/skillsService.js
 
-const API_URL = 'http://localhost:5000/api/skills';
+const API_URL = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL + '/skills' : '/api/skills';
 
 const getHeaders = () => {
   const token = localStorage.getItem('adminToken');

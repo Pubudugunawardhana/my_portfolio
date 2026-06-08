@@ -1,6 +1,6 @@
 // src/services/messageService.js
 
-const API_URL = 'http://localhost:5000/api/messages';
+const API_URL = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL + '/messages' : '/api/messages';
 
 const getHeaders = () => {
   const token = localStorage.getItem('adminToken');

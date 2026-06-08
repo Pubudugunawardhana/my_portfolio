@@ -32,6 +32,8 @@ export function ManageProfile() {
       }
     };
     fetchProfile();
+    window.addEventListener('focus', fetchProfile);
+    return () => window.removeEventListener('focus', fetchProfile);
   }, []);
 
   const handleFileChange = (e) => {

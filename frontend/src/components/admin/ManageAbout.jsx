@@ -22,6 +22,8 @@ export function ManageAbout() {
     };
     
     fetchExistingBio();
+    window.addEventListener('focus', fetchExistingBio);
+    return () => window.removeEventListener('focus', fetchExistingBio);
   }, []);
 
   const handleChange = (e) => {

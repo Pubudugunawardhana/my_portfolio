@@ -1,45 +1,55 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { 
-  listenToSkillsFromFirebase, 
   addOrUpdateSkillInFirebase, 
   deleteSkillFromFirebase,
-  checkAndSeedSkillsIntelligently 
+  getSkillsFromFirebase 
 } from '../services/skillsService';
 
 export function useSkills() {
   const [skills, setSkills] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    // 1. Immediately scan and seed the cloud if it's completely empty!
-    checkAndSeedSkillsIntelligently();
-
-    // 2. Attach our live pipeline to the React Local State
-    const unsubscribe = listenToSkillsFromFirebase((liveDataArray) => {
-      setSkills(liveDataArray);
+  const fetchSkills = useCallback(async () => {
+    try {
+      const data = await getSkillsFromFirebase();
+      setSkills(data);
+    } catch (err) {
+      console.error(err);
+    } finally {
       setIsLoading(false);
-    });
-
-    return () => unsubscribe();
+    }
   }, []);
+
+  useEffect(() => {
+    fetchSkills();
+    window.addEventListener('focus', fetchSkills);
+    
+    // Polling interval for true real-time effect
+    const interval = setInterval(fetchSkills, 5000);
+    
+    return () => {
+      window.removeEventListener('focus', fetchSkills);
+      clearInterval(interval);
+    };
+  }, [fetchSkills]);
 
   const addSkillCategory = async (categoryObj) => {
     await addOrUpdateSkillInFirebase(categoryObj);
+    fetchSkills();
   };
 
   const updateSkillCategory = async (oldName, newObj) => {
-    // If they changed the category NAME itself, we must physically delete the old document 
-    // and create a brand new one since the Document ID is the name!
-    if (oldName !== newObj.name) {
+    // We update the skill (if using old ID)
+    if (oldName !== newObj.name && oldName.length > 5) { // oldName is ID here
       await deleteSkillFromFirebase(oldName);
     }
-    
-    // Upload the modified payload
     await addOrUpdateSkillInFirebase(newObj);
+    fetchSkills();
   };
 
   const deleteSkillCategory = async (categoryName) => {
     await deleteSkillFromFirebase(categoryName);
+    fetchSkills();
   };
 
   return { skills, isLoading, addSkillCategory, updateSkillCategory, deleteSkillCategory };

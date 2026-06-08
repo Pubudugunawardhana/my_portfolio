@@ -1,6 +1,6 @@
 // src/services/analyticsService.js
 
-const API_URL = 'http://localhost:5000/api/analytics';
+const API_URL = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL + '/analytics' : '/api/analytics';
 
 export async function incrementPageViews() {
   try {
@@ -30,6 +30,36 @@ export function listenToDailyViews(callback) {
 }
 
 export async function getDashboardOverviewStats() {
-  // Mock aggregation for now
-  return { views: 0, projects: 0, messages: 0 };
+  try {
+    const projectsUrl = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL + '/projects' : '/api/projects';
+    const messagesUrl = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL + '/messages' : '/api/messages';
+    
+    const [analyticsRes, projectsRes, messagesRes] = await Promise.all([
+      fetch(API_URL),
+      fetch(projectsUrl),
+      fetch(messagesUrl, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        }
+      })
+    ]);
+
+    const analyticsData = analyticsRes.ok ? await analyticsRes.json() : [];
+    const projectsData = projectsRes.ok ? await projectsRes.json() : [];
+    const messagesData = messagesRes.ok ? await messagesRes.json() : [];
+
+    // Sum up all views across all dates
+    const totalViews = Array.isArray(analyticsData) 
+      ? analyticsData.reduce((sum, item) => sum + item.views, 0)
+      : 0;
+
+    return {
+      views: totalViews,
+      projects: Array.isArray(projectsData) ? projectsData.length : 0,
+      messages: Array.isArray(messagesData) ? messagesData.length : 0
+    };
+  } catch (error) {
+    console.error("Error fetching dashboard stats:", error);
+    return { views: 0, projects: 0, messages: 0 };
+  }
 }

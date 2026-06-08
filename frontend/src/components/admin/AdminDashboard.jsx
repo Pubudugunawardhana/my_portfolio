@@ -15,10 +15,23 @@ export function AdminDashboard() {
   const [stats, setStats] = useState({ views: 0, projects: 0, messages: 0 });
 
   useEffect(() => {
+    const fetchStats = () => {
+      getDashboardOverviewStats().then(data => {
+        setStats(data);
+      });
+    };
+    
     // Fire a parallel fetch on Admin mount
-    getDashboardOverviewStats().then(data => {
-      setStats(data);
-    });
+    fetchStats();
+    window.addEventListener('focus', fetchStats);
+    
+    // Polling interval for true real-time effect
+    const interval = setInterval(fetchStats, 5000);
+    
+    return () => {
+      window.removeEventListener('focus', fetchStats);
+      clearInterval(interval);
+    };
   }, []);
   return (
     <div className="flex h-screen bg-slate-50 dark:bg-slate-950 font-sans mt-0 selection:bg-blue-500 selection:text-white">

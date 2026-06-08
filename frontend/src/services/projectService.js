@@ -1,6 +1,6 @@
 // src/services/projectService.js
 
-const API_URL = 'http://localhost:5000/api/projects';
+const API_URL = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL + '/projects' : '/api/projects';
 
 const getHeaders = () => {
   const token = localStorage.getItem('adminToken');

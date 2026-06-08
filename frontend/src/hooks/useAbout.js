@@ -1,37 +1,38 @@
-import { useState, useEffect } from 'react';
-import { personalInfo as defaultInfo } from '../data/portfolio';
-
-const initializeStorage = () => {
-  const stored = localStorage.getItem('portfolio_about');
-  if (stored) {
-    return JSON.parse(stored);
-  } else {
-    localStorage.setItem('portfolio_about', JSON.stringify(defaultInfo));
-    return defaultInfo;
-  }
-};
+import { useState, useEffect, useCallback } from 'react';
+import { getAboutFromFirebase, updateAboutInFirebase } from '../services/aboutService';
 
 export function useAbout() {
   const [aboutInfo, setAboutInfo] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    setAboutInfo(initializeStorage());
+  const fetchAbout = useCallback(async () => {
+    try {
+      const data = await getAboutFromFirebase();
+      setAboutInfo(data || {});
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
-  const updateAbout = (newData) => {
-    setAboutInfo(newData);
-    localStorage.setItem('portfolio_about', JSON.stringify(newData));
-    window.dispatchEvent(new Event('about_updated'));
+  useEffect(() => {
+    fetchAbout();
+    window.addEventListener('focus', fetchAbout);
+    
+    // Polling interval for true real-time effect
+    const interval = setInterval(fetchAbout, 5000);
+    
+    return () => {
+      window.removeEventListener('focus', fetchAbout);
+      clearInterval(interval);
+    };
+  }, [fetchAbout]);
+
+  const updateAbout = async (newData) => {
+    await updateAboutInFirebase(newData);
+    fetchAbout();
   };
 
-  useEffect(() => {
-    const handleStorageUpdate = () => {
-       setAboutInfo(JSON.parse(localStorage.getItem('portfolio_about')));
-    };
-    
-    window.addEventListener('about_updated', handleStorageUpdate);
-    return () => window.removeEventListener('about_updated', handleStorageUpdate);
-  }, []);
-
-  return { aboutInfo, updateAbout };
+  return { aboutInfo, isLoading, updateAbout };
 }

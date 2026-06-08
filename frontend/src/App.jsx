@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { incrementPageViews } from './services/analyticsService';
+import { useAbout } from './hooks/useAbout';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
 import { About } from './components/About';
@@ -24,6 +25,23 @@ function PortfolioLayout() {
        sessionStorage.setItem('hasVisitedThisSession', 'true');
     }
   }, []);
+
+  const { aboutInfo } = useAbout();
+
+  useEffect(() => {
+    if (aboutInfo?.name) {
+      document.title = `${aboutInfo.name} | Portfolio`;
+    }
+    if (aboutInfo?.profileImage) {
+      let link = document.querySelector("link[rel~='icon']");
+      if (!link) {
+        link = document.createElement('link');
+        link.rel = 'icon';
+        document.getElementsByTagName('head')[0].appendChild(link);
+      }
+      link.href = aboutInfo.profileImage;
+    }
+  }, [aboutInfo]);
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300 antialiased selection:bg-primary-500 selection:text-white">

@@ -1,40 +1,54 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { 
   listenToProjectsFromFirebase, 
   addProjectToFirebase, 
   updateProjectInFirebase, 
   deleteProjectFromFirebase,
-  checkAndSeedProjectsIntelligently
+  getProjectsFromFirebase
 } from '../services/projectService';
 
 export function useProjects() {
   const [projects, setProjects] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    // 1. Instantly check if we need to migrate raw static code into the empty Cloud.
-    checkAndSeedProjectsIntelligently();
-
-    // 2. Open the socket! Let Firebase aggressively push new DB rows down into this React state.
-    const unsubscribe = listenToProjectsFromFirebase((liveData) => {
-      setProjects(liveData);
+  const fetchProjects = useCallback(async () => {
+    try {
+      const data = await getProjectsFromFirebase();
+      setProjects(data);
+    } catch (err) {
+      console.error(err);
+    } finally {
       setIsLoading(false);
-    });
-
-    return () => unsubscribe();
+    }
   }, []);
 
+  useEffect(() => {
+    fetchProjects();
+    // Simulate real-time by re-fetching when user switches tabs back
+    window.addEventListener('focus', fetchProjects);
+    
+    // Polling interval for true real-time effect
+    const interval = setInterval(fetchProjects, 5000);
+    
+    return () => {
+      window.removeEventListener('focus', fetchProjects);
+      clearInterval(interval);
+    };
+  }, [fetchProjects]);
+
   const addProject = async (projectObj) => {
-    // No longer generating a random Date ID. Firebase will securely assign an alphanumeric ID!
     await addProjectToFirebase(projectObj);
+    fetchProjects(); // Immediate UI update
   };
 
   const editProject = async (id, updatedData) => {
     await updateProjectInFirebase(id, updatedData);
+    fetchProjects(); // Immediate UI update
   };
 
   const deleteProject = async (id) => {
     await deleteProjectFromFirebase(id);
+    fetchProjects(); // Immediate UI update
   };
 
   return { projects, isLoading, addProject, editProject, deleteProject };

@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { motion } from 'framer-motion';
-import { doc, getDoc } from 'firebase/firestore';
-import { db } from '../../firebase';
 
 // Real Data Processor
 const generateRealData = (type, dailyViewsMap) => {
@@ -87,18 +85,30 @@ export function AnalyticsChart() {
   const [chartData, setChartData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Fetch Real Analytics Data from Firebase
+  // Fetch Real Analytics Data from MongoDB
   useEffect(() => {
     const fetchAnalytics = async () => {
       try {
-        const docSnap = await getDoc(doc(db, 'analytics', 'visitors'));
-        if (docSnap.exists() && docSnap.data().dailyViews) {
-          const fetchedMap = docSnap.data().dailyViews;
+        const API_URL = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL + '/analytics' : '/api/analytics';
+        const res = await fetch(API_URL);
+        if (res.ok) {
+          const data = await res.json();
+          // Transform array of {date, views} to map
+          const fetchedMap = {};
+          if (Array.isArray(data)) {
+            data.forEach(item => {
+              fetchedMap[item.date] = item.views;
+            });
+          }
           setDailyViewsMap(fetchedMap);
-          setChartData(generateRealData(timeRange, fetchedMap));
-        } else {
-          // If no dailyViews exist yet, initialize an empty map so it shows 0s
-          setChartData(generateRealData(timeRange, {}));
+          
+          // Use a functional state update to ensure we use the latest timeRange
+          setChartData((prevData) => {
+            // We can't access current state directly without stale closures unless we use the setter callback or ref.
+            // But actually timeRange is a dependency? No, timeRange isn't in dependency array.
+            // Let's just use the current timeRange from closure.
+            return generateRealData(timeRange, fetchedMap);
+          });
         }
       } catch (error) {
         console.error("Failed to load analytics chart data", error);
@@ -108,7 +118,10 @@ export function AnalyticsChart() {
     };
     
     fetchAnalytics();
-  }, []);
+    const interval = setInterval(fetchAnalytics, 5000);
+    
+    return () => clearInterval(interval);
+  }, [timeRange]);
 
   const handleTabChange = (range) => {
     setTimeRange(range);
