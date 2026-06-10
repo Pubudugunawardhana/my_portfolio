@@ -3,6 +3,9 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 
+// Ensure Vercel includes backend/package.json in the build
+try { require('../backend/package.json'); } catch (e) {}
+
 // Import Routes
 const authRoutes = require('../backend/routes/authRoutes');
 const aboutRoutes = require('../backend/routes/aboutRoutes');
