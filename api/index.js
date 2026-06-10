@@ -4,13 +4,13 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 
 // Import Routes
-const authRoutes = require('./routes/authRoutes');
-const aboutRoutes = require('./routes/aboutRoutes');
-const projectRoutes = require('./routes/projectRoutes');
-const skillRoutes = require('./routes/skillRoutes');
-const certificationRoutes = require('./routes/certificationRoutes');
-const messageRoutes = require('./routes/messageRoutes');
-const analyticsRoutes = require('./routes/analyticsRoutes');
+const authRoutes = require('../backend/routes/authRoutes');
+const aboutRoutes = require('../backend/routes/aboutRoutes');
+const projectRoutes = require('../backend/routes/projectRoutes');
+const skillRoutes = require('../backend/routes/skillRoutes');
+const certificationRoutes = require('../backend/routes/certificationRoutes');
+const messageRoutes = require('../backend/routes/messageRoutes');
+const analyticsRoutes = require('../backend/routes/analyticsRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
