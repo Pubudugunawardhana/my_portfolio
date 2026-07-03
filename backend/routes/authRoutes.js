@@ -62,23 +62,4 @@ router.post('/google', async (req, res) => {
   }
 });
 
-// Setup Initial User (Run Once or Use Seed Script)
-router.post('/setup', async (req, res) => {
-  const { email, password } = req.body;
-  const userExists = await User.findOne({ email });
-  if (userExists) {
-    return res.status(400).json({ message: 'User already exists' });
-  }
-  const user = await User.create({ email, password });
-  if (user) {
-    res.status(201).json({
-      _id: user._id,
-      email: user.email,
-      token: generateToken(user._id)
-    });
-  } else {
-    res.status(400).json({ message: 'Invalid user data' });
-  }
-});
-
 module.exports = router;
