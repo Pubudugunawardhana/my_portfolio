@@ -22,3 +22,6 @@ npm-debug.log*
 
 # image migration backups (contain original Base64 data)
 /scripts/backups/
+
+# old Vite cache
+/.vite/
