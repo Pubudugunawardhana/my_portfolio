@@ -177,7 +177,7 @@ function ProjectCard({ project, onOpen }) {
     <button
       type="button"
       onClick={onOpen}
-      className="card group flex h-full flex-col overflow-hidden text-left transition duration-300 hover:-translate-y-1 hover:border-accent/40 hover:shadow-xl hover:shadow-accent/10"
+      className="card group flex h-full w-full flex-col overflow-hidden text-left transition duration-300 hover:-translate-y-1 hover:border-accent/40 hover:shadow-xl hover:shadow-accent/10"
     >
       <span className="relative block aspect-[16/9] w-full overflow-hidden bg-card-hover">
         {project.image ? (
@@ -253,7 +253,7 @@ export function Projects({ projects, categories = [] }) {
                 </Reveal>
                 <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
                   {visibleMore.map((project, i) => (
-                    <Reveal key={project._id} delay={0.05 * (i % 3)}>
+                    <Reveal key={project._id} delay={0.05 * (i % 3)} className="h-full">
                       <ProjectCard project={project} onOpen={() => setSelected(project)} />
                     </Reveal>
                   ))}
