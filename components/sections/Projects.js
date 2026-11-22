@@ -8,6 +8,7 @@ import { Section } from '@/components/site/Section';
 import { Reveal } from '@/components/site/Reveal';
 import { SmartImage } from '@/components/site/SmartImage';
 import { Slideshow, projectImages } from '@/components/site/Slideshow';
+import { Modal } from '@/components/site/Modal';
 import { EmptyState } from '@/components/site/EmptyState';
 import { categoryName, itemCategory } from '@/lib/projectCategories';
 import { ALL, CategoryTabs, buildTabs, filterByTab } from '@/components/site/CategoryTabs';
@@ -42,66 +43,32 @@ function ProjectLinks({ project, size = 'sm' }) {
 }
 
 function ProjectModal({ project, onClose }) {
-  useEffect(() => {
-    const onKey = (e) => e.key === 'Escape' && onClose();
-    document.addEventListener('keydown', onKey);
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.removeEventListener('keydown', onKey);
-      document.body.style.overflow = '';
-    };
-  }, [onClose]);
-
   return (
-    <motion.div
-      className="fixed inset-0 z-[60] flex items-end justify-center p-0 sm:items-center sm:p-6"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="project-title"
-    >
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
-      <motion.div
-        className="card relative flex max-h-[92vh] w-full max-w-3xl flex-col overflow-hidden rounded-b-none sm:rounded-3xl"
-        initial={{ y: 40, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        exit={{ y: 40, opacity: 0 }}
-        transition={{ type: 'spring', bounce: 0.15, duration: 0.45 }}
-      >
-        <button
-          onClick={onClose}
-          aria-label="Close"
-          className="absolute right-4 top-4 z-10 grid h-9 w-9 place-items-center rounded-full bg-black/40 text-white backdrop-blur transition hover:bg-black/60"
-        >
-          <X size={16} />
-        </button>
-        {project.image && (
-          <Slideshow
-            images={projectImages(project)}
-            alt={project.title}
-            sizes="768px"
-            interval={4000}
-            className="aspect-video w-full shrink-0 overflow-hidden bg-card-hover"
-          />
-        )}
-        <div className="overflow-y-auto p-6 sm:p-9">
-          <h3 id="project-title" className="text-2xl font-semibold tracking-tight sm:text-3xl">{project.title}</h3>
-          <div className="mt-4 flex flex-wrap gap-2">
-            {project.tech.map((t) => (
-              <span key={t} className="rounded-full bg-accent-soft px-3 py-1 text-xs font-medium text-accent">{t}</span>
-            ))}
-          </div>
-          <p className="mt-6 whitespace-pre-wrap leading-relaxed text-muted">{project.description}</p>
-          {(project.githubUrl || project.liveUrl) && (
-            <div className="mt-8 flex flex-col gap-3 border-t border-border pt-6 sm:flex-row">
-              <ProjectLinks project={project} size="lg" />
-            </div>
-          )}
+    <Modal onClose={onClose} labelledBy="project-title">
+      {project.image && (
+        <Slideshow
+          images={projectImages(project)}
+          alt={project.title}
+          sizes="768px"
+          interval={4000}
+          className="aspect-video w-full shrink-0 overflow-hidden bg-card-hover"
+        />
+      )}
+      <div className="overflow-y-auto p-6 sm:p-9">
+        <h3 id="project-title" className="text-2xl font-semibold tracking-tight sm:text-3xl">{project.title}</h3>
+        <div className="mt-4 flex flex-wrap gap-2">
+          {project.tech.map((t) => (
+            <span key={t} className="rounded-full bg-accent-soft px-3 py-1 text-xs font-medium text-accent">{t}</span>
+          ))}
         </div>
-      </motion.div>
-    </motion.div>
+        <p className="mt-6 whitespace-pre-wrap leading-relaxed text-muted">{project.description}</p>
+        {(project.githubUrl || project.liveUrl) && (
+          <div className="mt-8 flex flex-col gap-3 border-t border-border pt-6 sm:flex-row">
+            <ProjectLinks project={project} size="lg" />
+          </div>
+        )}
+      </div>
+    </Modal>
   );
 }
 
@@ -207,6 +174,8 @@ function ProjectCard({ project, onOpen }) {
     </button>
   );
 }
+
+export { ProjectModal };
 
 export function Projects({ projects, categories = [] }) {
   const [selected, setSelected] = useState(null);

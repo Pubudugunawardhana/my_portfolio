@@ -35,7 +35,7 @@ export default async function HomePage() {
       <main>
         <Hero about={about} />
         <About about={about} />
-        <Skills skills={skills} />
+        <Skills skills={skills} projects={projects} />
         <Projects projects={projects} categories={projectCategories} />
         <Certifications certifications={certifications} categories={certificationCategories} />
         <Blogs posts={posts} mediumUrl={about.medium} />
