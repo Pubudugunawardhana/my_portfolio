@@ -9,6 +9,8 @@ import { Reveal } from '@/components/site/Reveal';
 import { SmartImage } from '@/components/site/SmartImage';
 import { Slideshow, projectImages } from '@/components/site/Slideshow';
 import { EmptyState } from '@/components/site/EmptyState';
+import { categoryName, itemCategory } from '@/lib/projectCategories';
+import { ALL, CategoryTabs, buildTabs, filterByTab } from '@/components/site/CategoryTabs';
 
 // Newest projects get the large showcase rows; the rest go in a compact grid.
 const FEATURED_COUNT = 3;
@@ -103,7 +105,7 @@ function ProjectModal({ project, onClose }) {
   );
 }
 
-function ProjectRow({ project, index, onOpen }) {
+function ProjectRow({ project, index, categories, onOpen }) {
   const reversed = index % 2 === 1;
   const images = projectImages(project);
   return (
@@ -134,7 +136,8 @@ function ProjectRow({ project, index, onOpen }) {
         {/* Details */}
         <div className={reversed ? 'lg:order-1' : ''}>
           <p className="font-mono text-sm text-accent">
-            {String(index + 1).padStart(2, '0')} <span className="text-muted">— {index === 0 ? 'Featured' : 'Project'}</span>
+            {String(index + 1).padStart(2, '0')} <span className="text-muted">— {index === 0 ? 'Featured' : 'Project'}
+              {categories.length > 1 && <> · {categoryName(itemCategory(project, categories), categories)}</>}</span>
           </p>
           <h3 className="mt-3 text-2xl font-bold leading-tight tracking-tight sm:text-3xl">{project.title}</h3>
           <p className="mt-4 line-clamp-3 whitespace-pre-line leading-relaxed text-muted">{project.description}</p>
@@ -205,51 +208,66 @@ function ProjectCard({ project, onOpen }) {
   );
 }
 
-export function Projects({ projects }) {
+export function Projects({ projects, categories = [] }) {
   const [selected, setSelected] = useState(null);
   const [showAll, setShowAll] = useState(false);
+  const [active, setActive] = useState(ALL);
 
-  const featured = projects.slice(0, FEATURED_COUNT);
-  const more = projects.slice(FEATURED_COUNT);
+  const tabs = buildTabs(projects, categories);
+  const showTabs = tabs.length > 2;
+
+  const filtered = filterByTab(projects, categories, active);
+  const featured = filtered.slice(0, FEATURED_COUNT);
+  const more = filtered.slice(FEATURED_COUNT);
   const visibleMore = showAll ? more : more.slice(0, MORE_COUNT);
 
+  const selectTab = (value) => {
+    setActive(value);
+    setShowAll(false);
+  };
+
   return (
-    <Section id="projects" eyebrow="Work" title="Selected projects" description="Things I've designed and built.">
+    <Section id="projects" eyebrow="Work" title="Selected projects" description="Things I've designed, built and tested.">
       {projects.length === 0 ? (
         <EmptyState icon={FolderGit2} title="No projects yet">Add some from the admin panel.</EmptyState>
       ) : (
         <>
-          {/* Latest projects as large showcase rows */}
-          <div className="space-y-16 sm:space-y-20">
-            {featured.map((project, i) => (
-              <ProjectRow key={project._id} project={project} index={i} onOpen={() => setSelected(project)} />
-            ))}
-          </div>
+          {showTabs && <CategoryTabs tabs={tabs} active={active} onChange={selectTab} label="Project categories" layoutId="project-tab" />}
 
-          {/* Everything else as a compact grid */}
-          {more.length > 0 && (
-            <div className="mt-20 sm:mt-24">
-              <Reveal className="mb-8 flex items-center gap-4">
-                <h3 className="text-xl font-semibold tracking-tight">More projects</h3>
-                <span className="h-px flex-1 bg-border" />
-                <span className="font-mono text-sm text-muted">{more.length}</span>
-              </Reveal>
-              <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                {visibleMore.map((project, i) => (
-                  <Reveal key={project._id} delay={0.05 * (i % 3)}>
-                    <ProjectCard project={project} onOpen={() => setSelected(project)} />
-                  </Reveal>
-                ))}
-              </div>
-              {more.length > MORE_COUNT && (
-                <div className="mt-10 text-center">
-                  <button onClick={() => setShowAll((s) => !s)} className="btn-ghost">
-                    {showAll ? 'Show less' : `Show all ${more.length} more projects`}
-                  </button>
-                </div>
-              )}
+          {/* Keyed by tab so switching re-runs the entrance animations */}
+          <motion.div key={active} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
+            {/* Latest projects as large showcase rows */}
+            <div className="space-y-16 sm:space-y-20">
+              {featured.map((project, i) => (
+                <ProjectRow key={project._id} project={project} index={i} categories={categories} onOpen={() => setSelected(project)} />
+              ))}
             </div>
-          )}
+
+            {/* Everything else as a compact grid */}
+            {more.length > 0 && (
+              <div className="mt-20 sm:mt-24">
+                <Reveal className="mb-8 flex items-center gap-4">
+                  <h3 className="text-xl font-semibold tracking-tight">More projects</h3>
+                  <span className="h-px flex-1 bg-border" />
+                  <span className="font-mono text-sm text-muted">{more.length}</span>
+                </Reveal>
+                <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                  {visibleMore.map((project, i) => (
+                    <Reveal key={project._id} delay={0.05 * (i % 3)}>
+                      <ProjectCard project={project} onOpen={() => setSelected(project)} />
+                    </Reveal>
+                  ))}
+                </div>
+                {more.length > MORE_COUNT && (
+                  <div className="mt-10 text-center">
+                    <button onClick={() => setShowAll((v) => !v)} className="btn-ghost">
+                      {showAll ? 'Show less' : `Show all ${more.length} more projects`}
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </motion.div>
         </>
       )}
 

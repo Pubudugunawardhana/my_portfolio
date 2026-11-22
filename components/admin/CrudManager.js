@@ -10,6 +10,7 @@ import { ActionStatus, Field } from './ui';
 const toFormValue = (field, value) => {
   if (field.type === 'tags') return (value ?? []).join(', ');
   if (field.type === 'gallery') return value ?? [];
+  if (field.type === 'select') return field.options.some((o) => o.value === value) ? value : field.defaultValue || field.options[0]?.value || '';
   return value ?? '';
 };
 
@@ -94,6 +95,12 @@ function Editor({ kind, fields, item, onClose }) {
               <Field key={f.name} label={`${f.label}${f.required ? '' : ' (optional)'}`} hint={f.hint}>
                 {f.type === 'textarea' ? (
                   <textarea rows={7} required={f.required} value={values[f.name]} onChange={(e) => set(f.name, e.target.value)} className="input resize-y" />
+                ) : f.type === 'select' ? (
+                  <select value={values[f.name]} onChange={(e) => set(f.name, e.target.value)} className="input">
+                    {f.options.map((o) => (
+                      <option key={o.value} value={o.value}>{o.label}</option>
+                    ))}
+                  </select>
                 ) : (
                   <input
                     type={f.type === 'url' ? 'url' : 'text'}

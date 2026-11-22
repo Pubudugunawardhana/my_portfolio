@@ -1,5 +1,5 @@
 import { connection } from 'next/server';
-import { getAbout, getProjects, getSkills, getCertifications, safe } from '@/lib/data';
+import { getAbout, getProjects, getProjectCategories, getSkills, getCertifications, getCertificationCategories, safe } from '@/lib/data';
 import { getMediumPosts } from '@/lib/medium';
 import { Navbar } from '@/components/site/Navbar';
 import { PageViewTracker } from '@/components/site/PageViewTracker';
@@ -17,11 +17,13 @@ export default async function HomePage() {
   // time never gets baked into a static page.
   await connection();
 
-  const [about, projects, skills, certifications, posts] = await Promise.all([
+  const [about, projects, projectCategories, skills, certifications, certificationCategories, posts] = await Promise.all([
     safe(getAbout, {}),
     safe(getProjects, []),
+    safe(getProjectCategories, []),
     safe(getSkills, []),
     safe(getCertifications, []),
+    safe(getCertificationCategories, []),
     getMediumPosts(),
   ]);
 
@@ -34,8 +36,8 @@ export default async function HomePage() {
         <Hero about={about} />
         <About about={about} />
         <Skills skills={skills} />
-        <Projects projects={projects} />
-        <Certifications certifications={certifications} />
+        <Projects projects={projects} categories={projectCategories} />
+        <Certifications certifications={certifications} categories={certificationCategories} />
         <Blogs posts={posts} mediumUrl={about.medium} />
       </main>
       <Contact about={about} />
