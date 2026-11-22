@@ -2,11 +2,15 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
-import { ChevronDown, Layers } from 'lucide-react';
+import { ArrowUpRight, ChevronDown, FolderGit2, Layers } from 'lucide-react';
 import { Section } from '@/components/site/Section';
 import { Reveal } from '@/components/site/Reveal';
 import { TechIcon, techColor } from '@/components/site/TechIcon';
 import { EmptyState } from '@/components/site/EmptyState';
+import { Modal } from '@/components/site/Modal';
+import { SmartImage } from '@/components/site/SmartImage';
+import { ProjectModal } from '@/components/sections/Projects';
+import { projectsUsing, sameTech } from '@/lib/techMatch';
 
 const ALL = 'All';
 const COLLAPSED_ROWS = 2;
@@ -25,9 +29,73 @@ function measure(list) {
   return { full, collapsed: last.offsetTop + last.offsetHeight, hidden: tiles.length - shown.length };
 }
 
-export function Skills({ skills }) {
+// Details for one skill: its categories and the projects built with it.
+// Clicking a project swaps in that project's own modal.
+function SkillModal({ tech, skills, projects, onOpenProject, onClose }) {
+  const groups = skills.filter((g) => g.tech.some((t) => sameTech(t, tech))).map((g) => g.name);
+  const used = projectsUsing(tech, projects);
+  const color = techColor(tech) ?? 'var(--accent)';
+
+  return (
+    <Modal onClose={onClose} labelledBy="skill-title" maxWidth="max-w-xl">
+      <div
+        className="flex items-center gap-5 border-b border-border p-6 pr-16 sm:p-8 sm:pr-16"
+        style={{ background: `radial-gradient(circle at 15% 50%, color-mix(in srgb, ${color} 16%, transparent), transparent 65%)` }}
+      >
+        <span className="grid h-16 w-16 shrink-0 place-items-center rounded-2xl border border-border bg-card shadow-sm">
+          <TechIcon name={tech} className="h-9 w-9" />
+        </span>
+        <div className="min-w-0">
+          <h3 id="skill-title" className="text-2xl font-semibold tracking-tight">{tech}</h3>
+          {groups.length > 0 && (
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {groups.map((g) => (
+                <span key={g} className="rounded-full bg-accent-soft px-2.5 py-0.5 text-xs font-medium text-accent">{g}</span>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="overflow-y-auto p-6 sm:p-8">
+        <p className="mb-4 text-sm font-medium text-muted">
+          {used.length > 0 ? `Used in ${used.length} project${used.length === 1 ? '' : 's'}` : 'Not featured in a project here yet.'}
+        </p>
+        {used.length > 0 && (
+          <ul className="space-y-3">
+            {used.map((p) => (
+              <li key={p._id}>
+                <button
+                  type="button"
+                  onClick={() => onOpenProject(p)}
+                  className="group flex w-full items-center gap-4 rounded-2xl border border-border bg-bg p-3 text-left transition hover:border-accent/40 hover:bg-card-hover"
+                >
+                  <span className="relative h-14 w-20 shrink-0 overflow-hidden rounded-lg bg-card-hover">
+                    {p.image ? (
+                      <SmartImage src={p.image} alt="" fill sizes="80px" className="object-cover object-top" />
+                    ) : (
+                      <FolderGit2 className="absolute inset-0 m-auto h-5 w-5 text-muted/50" />
+                    )}
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="line-clamp-2 font-medium leading-snug">{p.title}</span>
+                  </span>
+                  <ArrowUpRight size={18} className="shrink-0 text-muted transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-accent" />
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </Modal>
+  );
+}
+
+export function Skills({ skills, projects = [] }) {
   const [active, setActive] = useState(ALL);
   const [expanded, setExpanded] = useState(false);
+  const [openSkill, setOpenSkill] = useState(null);
+  const [openProject, setOpenProject] = useState(null);
   const [size, setSize] = useState(null);
   const listRef = useRef(null);
   const sectionRef = useRef(null);
@@ -114,7 +182,12 @@ export function Skills({ skills }) {
                       exit={{ opacity: 0, scale: 0.85 }}
                       transition={{ duration: 0.3, ease: EASE, delay: Math.min(i * 0.02, 0.2) }}
                       style={{ '--brand': color }}
-                      className="group card relative flex aspect-square flex-col items-center justify-center gap-2.5 overflow-hidden p-3 transition-[border-color,box-shadow,transform] duration-300 hover:-translate-y-1 hover:border-[color-mix(in_srgb,var(--brand)_50%,transparent)] hover:shadow-[0_10px_40px_-10px_var(--brand)]"
+                      onClick={() => setOpenSkill(tech)}
+                      onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), setOpenSkill(tech))}
+                      tabIndex={0}
+                      role="button"
+                      aria-label={`${tech} – see related projects`}
+                      className="group card relative flex aspect-square cursor-pointer flex-col items-center justify-center gap-2.5 overflow-hidden p-3 transition-[border-color,box-shadow,transform] duration-300 hover:-translate-y-1 hover:border-[color-mix(in_srgb,var(--brand)_50%,transparent)] hover:shadow-[0_10px_40px_-10px_var(--brand)]"
                     >
                       {/* Brand-colored glow on hover */}
                       <span className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,color-mix(in_srgb,var(--brand)_18%,transparent),transparent_70%)] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
@@ -152,6 +225,26 @@ export function Skills({ skills }) {
           </AnimatePresence>
         </div>
       )}
+
+      <AnimatePresence mode="wait">
+        {openProject ? (
+          <ProjectModal key="project" project={openProject} onClose={() => setOpenProject(null)} />
+        ) : (
+          openSkill && (
+            <SkillModal
+              key="skill"
+              tech={openSkill}
+              skills={skills}
+              projects={projects}
+              onClose={() => setOpenSkill(null)}
+              onOpenProject={(p) => {
+                setOpenSkill(null);
+                setOpenProject(p);
+              }}
+            />
+          )
+        )}
+      </AnimatePresence>
     </Section>
   );
 }
