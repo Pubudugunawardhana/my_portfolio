@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { AnimatePresence } from 'motion/react';
-import { Award, ArrowUpRight } from 'lucide-react';
+import { Award, ArrowUpRight, FileText } from 'lucide-react';
 import { Section } from '@/components/site/Section';
 import { SmartImage } from '@/components/site/SmartImage';
 import { Carousel } from '@/components/site/Carousel';
@@ -30,11 +30,18 @@ function CertificationModal({ cert, categories, onClose }) {
         <h3 id="certification-title" className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">{cert.title}</h3>
         <p className="mt-1 text-accent">{cert.issuer}</p>
         {cert.description && <p className="mt-6 whitespace-pre-wrap leading-relaxed text-muted">{cert.description}</p>}
-        {cert.credentialUrl && (
-          <div className="mt-8 border-t border-border pt-6">
-            <a href={cert.credentialUrl} target="_blank" rel="noopener noreferrer" className="btn-primary py-3">
-              Verify credential <ArrowUpRight size={16} />
-            </a>
+        {(cert.credentialUrl || cert.pdfUrl) && (
+          <div className="mt-8 flex flex-col gap-3 border-t border-border pt-6 sm:flex-row">
+            {cert.credentialUrl && (
+              <a href={cert.credentialUrl} target="_blank" rel="noopener noreferrer" className="btn-primary py-3">
+                Verify credential <ArrowUpRight size={16} />
+              </a>
+            )}
+            {cert.pdfUrl && (
+              <a href={cert.pdfUrl} target="_blank" rel="noopener noreferrer" className="btn-ghost py-3">
+                <FileText size={16} /> View certificate (PDF)
+              </a>
+            )}
           </div>
         )}
       </div>

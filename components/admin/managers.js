@@ -138,7 +138,8 @@ export function CertificationsManager({ items, categories }) {
         categoryField(categories, 'Certifications'),
         { name: 'issuer', label: 'Issuer', required: true, placeholder: 'Microsoft' },
         { name: 'date', label: 'Date', required: true, placeholder: 'Apr 2026' },
-        { name: 'image', label: 'Certificate image', type: 'image', aspect: 'aspect-[4/3]' },
+        { name: 'image', label: 'Certificate', type: 'image', aspect: 'aspect-[4/3]', pdfField: 'pdfUrl', hint: 'Upload an image, or the certificate PDF – its first page is shown on the site and the PDF can be opened from it.' },
+        { name: 'pdfUrl', type: 'hidden' },
         { name: 'description', label: 'Description', type: 'textarea' },
         { name: 'credentialUrl', label: 'Credential URL', type: 'url' },
       ]}

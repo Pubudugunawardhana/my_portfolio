@@ -23,10 +23,23 @@ async function uploadToCloudinary(file, resourceType) {
   return data.secure_url;
 }
 
+const isPdf = (file) => file.type === 'application/pdf' || /\.pdf$/i.test(file.name);
+
 // Uploads straight to Cloudinary and reports the resulting URL via onChange.
-export function FileUpload({ value, onChange, kind = 'image', aspect = 'aspect-video', label = 'Upload image' }) {
+// With `acceptPdf`, an image field also takes a PDF: its first page becomes the
+// image (onChange) and the original PDF is uploaded too (onPdfChange).
+export function FileUpload({
+  value,
+  onChange,
+  kind = 'image',
+  aspect = 'aspect-video',
+  label = 'Upload image',
+  acceptPdf = false,
+  pdfValue = '',
+  onPdfChange,
+}) {
   const inputRef = useRef(null);
-  const [busy, setBusy] = useState(false);
+  const [busy, setBusy] = useState(null); // null | status text
   const [error, setError] = useState(null);
   const isImage = kind === 'image';
 
@@ -34,15 +47,31 @@ export function FileUpload({ value, onChange, kind = 'image', aspect = 'aspect-v
     if (!file) return;
     setError(null);
     if (file.size > MAX_MB * 1024 * 1024) return setError(`File must be under ${MAX_MB} MB`);
-    setBusy(true);
     try {
-      onChange(await uploadToCloudinary(file, isImage ? 'image' : 'raw'));
+      if (isImage && acceptPdf && isPdf(file)) {
+        setBusy('Converting PDF…');
+        const { pdfFirstPageToJpeg } = await import('@/lib/pdfToImage');
+        const preview = await pdfFirstPageToJpeg(file);
+        setBusy('Uploading…');
+        const [imageUrl, pdfUrl] = await Promise.all([uploadToCloudinary(preview, 'image'), uploadToCloudinary(file, 'raw')]);
+        onChange(imageUrl);
+        onPdfChange?.(pdfUrl);
+      } else {
+        setBusy('Uploading…');
+        onChange(await uploadToCloudinary(file, isImage ? 'image' : 'raw'));
+        if (acceptPdf) onPdfChange?.(''); // a plain image replaces any earlier PDF
+      }
     } catch (err) {
-      setError(err.message);
+      setError(err.message || 'Upload failed');
     } finally {
-      setBusy(false);
+      setBusy(null);
       if (inputRef.current) inputRef.current.value = '';
     }
+  };
+
+  const remove = () => {
+    onChange('');
+    if (acceptPdf) onPdfChange?.('');
   };
 
   return (
@@ -65,18 +94,27 @@ export function FileUpload({ value, onChange, kind = 'image', aspect = 'aspect-v
         ) : (
           <button type="button" onClick={() => inputRef.current?.click()} className="flex h-full min-h-28 w-full flex-col items-center justify-center gap-2 p-6 text-sm text-muted hover:text-fg">
             <UploadCloud size={22} /> {label}
-            <span className="text-xs">or drag &amp; drop · max {MAX_MB} MB</span>
+            <span className="text-xs">
+              {acceptPdf ? 'Image or PDF' : 'or drag & drop'} · max {MAX_MB} MB
+            </span>
           </button>
         )}
         {busy && (
-          <div className="absolute inset-0 grid place-items-center bg-bg/80 text-sm"><Loader2 className="animate-spin" /></div>
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-bg/85 text-sm text-muted">
+            <Loader2 className="animate-spin" /> {busy}
+          </div>
         )}
       </div>
 
       {value && (
-        <div className="mt-2 flex gap-2">
+        <div className="mt-2 flex flex-wrap items-center gap-2">
           <button type="button" onClick={() => inputRef.current?.click()} className="btn-ghost px-3 py-1.5 text-xs"><UploadCloud size={14} /> Replace</button>
-          <button type="button" onClick={() => onChange('')} className="btn-ghost px-3 py-1.5 text-xs text-red-500"><Trash2 size={14} /> Remove</button>
+          <button type="button" onClick={remove} className="btn-ghost px-3 py-1.5 text-xs text-red-500"><Trash2 size={14} /> Remove</button>
+          {pdfValue && (
+            <a href={pdfValue} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 px-2 text-xs text-muted hover:text-accent">
+              <FileText size={14} /> PDF attached
+            </a>
+          )}
         </div>
       )}
       {error && <p className="mt-2 text-xs text-red-500">{error}</p>}
@@ -85,7 +123,7 @@ export function FileUpload({ value, onChange, kind = 'image', aspect = 'aspect-v
         ref={inputRef}
         type="file"
         hidden
-        accept={isImage ? 'image/*' : '.pdf,application/pdf'}
+        accept={isImage ? (acceptPdf ? 'image/*,.pdf,application/pdf' : 'image/*') : '.pdf,application/pdf'}
         onChange={(e) => handleFile(e.target.files?.[0])}
       />
     </div>

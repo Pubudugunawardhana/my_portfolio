@@ -45,7 +45,7 @@ const schemas = {
     title: z.string().trim().min(1, 'Title is required').max(200),
     issuer: z.string().trim().min(1, 'Issuer is required').max(200),
     date: z.string().trim().min(1, 'Date is required').max(50),
-    description: text(2000), image: optionalUrl, credentialUrl: optionalUrl,
+    description: text(2000), image: optionalUrl, credentialUrl: optionalUrl, pdfUrl: optionalUrl,
     category: categoryKey,
   }),
 };
