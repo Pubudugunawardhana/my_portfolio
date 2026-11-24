@@ -89,9 +89,17 @@ function Editor({ kind, fields, item, onClose }) {
               </Field>
             ) : f.type === 'image' ? (
               <Field key={f.name} label={f.label} hint={f.hint}>
-                <FileUpload value={values[f.name]} onChange={(url) => set(f.name, url)} aspect={f.aspect} />
+                <FileUpload
+                  value={values[f.name]}
+                  onChange={(url) => set(f.name, url)}
+                  aspect={f.aspect}
+                  label={f.pdfField ? 'Upload image or PDF' : undefined}
+                  acceptPdf={Boolean(f.pdfField)}
+                  pdfValue={f.pdfField ? values[f.pdfField] : ''}
+                  onPdfChange={f.pdfField ? (url) => set(f.pdfField, url) : undefined}
+                />
               </Field>
-            ) : (
+            ) : f.type === 'hidden' ? null : (
               <Field key={f.name} label={`${f.label}${f.required ? '' : ' (optional)'}`} hint={f.hint}>
                 {f.type === 'textarea' ? (
                   <textarea rows={7} required={f.required} value={values[f.name]} onChange={(e) => set(f.name, e.target.value)} className="input resize-y" />
